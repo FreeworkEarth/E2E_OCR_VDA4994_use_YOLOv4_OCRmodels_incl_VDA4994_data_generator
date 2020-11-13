@@ -1,0 +1,8 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Datasource local storage ignored files
+/../../../../../../../../../../:\Users\chari\Google Drive\00_Masterthesis\Masterarbeit\00_masterthesis_code\xxx_YOLOv4_tutorials\E2E_OCR_VDA4994_use_YOLOv4_OCRmodels_incl_VDA4994_data_generator\.idea/dataSources/
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
