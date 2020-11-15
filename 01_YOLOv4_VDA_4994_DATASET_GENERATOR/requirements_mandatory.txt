@@ -1,0 +1,8 @@
+pip
+imgaug
+mathplotlib
+numpy
+opencv
+pillow
+plotly
+pytesseract
