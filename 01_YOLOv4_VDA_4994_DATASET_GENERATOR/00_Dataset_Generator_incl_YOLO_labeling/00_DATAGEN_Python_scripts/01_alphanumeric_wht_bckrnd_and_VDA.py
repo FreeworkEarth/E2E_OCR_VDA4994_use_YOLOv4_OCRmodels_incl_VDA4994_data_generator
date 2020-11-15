@@ -497,7 +497,7 @@ for i in range(len(img_list_path_absolute)):
                                               str(normalized_heigth_YOLO_alphanum)  # Odd
 
                     f.write(YOLO_label_string_alphanum)
-                    f.write("\n")git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch C:\Users\chari\Google Drive\00_Masterthesis\Masterarbeit\000_CODE\Git\.git\objects\pack --prune-empty
+                    f.write("\n")
 
             complete_dataset.append([filename_str, filename_txt])
             complete_dataset_np = np.append(filename_str, filename_txt)
