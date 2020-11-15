@@ -431,7 +431,7 @@ for i in range(len(img_list_path_absolute)):
                                               int(size_font_yolo_label_alphanum * factor_size_alphanumerics))
                 # Draw the text
                 draw.text((auto_calc_start_alphanumeric_left_top_x,
-                           (auto_calc_start_alphanumeric_left_top_y - (250*factor_size_alphanumerics))),
+                           (auto_calc_start_alphanumeric_left_top_y - ((font_size_alphanumerics+size_font_yolo_label_alphanum)*factor_size_alphanumerics))),
                           value_random_alphanumerical, fill=(R_val_alphanum,G_val_alphanum, B_val_alphanum), font=font_pil)
                 # Get back the image to OpenCV format
                 img = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
