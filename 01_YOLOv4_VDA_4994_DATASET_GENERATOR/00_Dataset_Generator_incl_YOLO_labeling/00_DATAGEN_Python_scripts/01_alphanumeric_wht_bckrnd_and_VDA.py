@@ -19,13 +19,11 @@ import os
 from PIL import ImageFont, ImageDraw, Image
 # random text/numbers
 from random import randrange, uniform, randint
-#from Helper_Functions.random_text_gen import random_text_gen
-#from Helper_Functions import random_numbers_strings
+# from Helper_Functions.random_text_gen import random_text_gen
+# from Helper_Functions import random_numbers_strings
 import random_text_gen
 from random_text_gen import *
 import qrcode
-
-
 
 """WORKFLOW: Training and Testdata generator (not Augmentator so far): 
 0. GIVE Absolute path of raw image folder == List all filenames and LOAD just Images in order of list 
@@ -49,7 +47,6 @@ import qrcode
 """ 8. Write classname into boxes"""
 """ 9 . normalize for labelling"""
 
-
 # TODO while loop which creates random labels in an image
 # todo create label boxes around createt labels for YOLO including random colours (rgb 0-255) = 8 bit
 # TODO all open cv image operations/ data augementator ops and randomly choose a few inside a while loop for a label position ( for each label ==> picture in different variations)
@@ -59,35 +56,39 @@ import qrcode
 yolo_version = 4
 
 # image path setup ( here: in 01_4k_images_raw/00_Raw_images_4k)
+#path_to_training_images = Path(r"C:\Users\chari\Google Drive\00_Masterthesis\Masterarbeit\000_CODE\Git\01_YOLOv4_VDA_4994_DATASET_GENERATOR\00_Dataset_Generator_incl_YOLO_labeling\01_4k_images_raw\00_Raw_images_4K")  ## ipath to raw images from repo
 path_to_training_images = Path(r"C:\Users\chari\Google Drive\00_Masterthesis\Masterarbeit\000_CODE\Git\01_YOLOv4_VDA_4994_DATASET_GENERATOR\00_Dataset_Generator_incl_YOLO_labeling\01_4k_images_raw\xxx_Test_for_Image_generator")  ## ipath to raw images from repo
-image_resolution = "FullHD"     #"FullHD"  or 4K      ____4096 × 2160 (full frame, 256∶135 or ≈1.90∶1 aspect ratio)
+
+image_resolution = "FullHD"  # "FullHD"  or 4K      ____4096 × 2160 (full frame, 256∶135 or ≈1.90∶1 aspect ratio)
 
 number_datasets = 5
 complete_dataset = [[]]
-complete_datset_np = np.array([],[])
+complete_datset_np = np.array([], [])
 
-font = cv2.FONT_HERSHEY_SIMPLEX  #OpenCV font
+font = cv2.FONT_HERSHEY_SIMPLEX  # OpenCV font
 number_of_images_per_basic_image = 2  # how many images are printed for each backround image
-white_depend_on_yellow_label = False   # if white and yellow label are always in the same difference to each other
+white_depend_on_yellow_label = False  # if white and yellow label are always in the same difference to each other
 
-labels_random_size_ratio_min = 0.2          # min 0.1
-labels_random_size_ratio_max = 10         # max 10
+labels_random_size_ratio_min = 0.2  # min 0.1
+labels_random_size_ratio_max = 10  # max 10
 alphanumeric_random_size_ratio_min = 0.1
 alphanumeric_random_size_ratio_max = 2
 
 """Image Size Definition"""
 labels_random_size_ratio_min_FullHD = labels_random_size_ratio_min / 2
 labels_random_size_ratio_max_FullHD = labels_random_size_ratio_max / 2
-alphanumeric_random_size_ratio_min_FullHD = alphanumeric_random_size_ratio_min/2
-alphanumeric_random_size_ratio_max_FullHD = alphanumeric_random_size_ratio_max/2
+alphanumeric_random_size_ratio_min_FullHD = alphanumeric_random_size_ratio_min / 2
+alphanumeric_random_size_ratio_max_FullHD = alphanumeric_random_size_ratio_max / 2
 
 """ Definition alphanumerics"""
 string_alphanumeric_numbers = "0123456789"
 string_alphanumeric_lowercase = "abcdefghijklmnopqrstuvwxyz"
 string_alphanumeric_uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-alphanumeric_list = ["0","1","2","3","4","5","6","7","8","9",
-                     "A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
-                     "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
+alphanumeric_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+                     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+                     "U", "V", "W", "X", "Y", "Z",
+                     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+                     "u", "v", "w", "x", "y", "z"]
 print(len(alphanumeric_list))
 
 string_alphanumeric = string_alphanumeric_numbers + string_alphanumeric_uppercase + string_alphanumeric_lowercase
@@ -108,19 +109,17 @@ black_col_B = 0
 """ YOLO Label , VDA label and picture size definition"""
 ## yellow VDA label:
 yl_label_width_no_scaled_4k = int(225)
-yl_label_height_no_scaled  = int(50)
+yl_label_height_no_scaled = int(50)
 ## white VDA label A5 size or ratio = 1.4189
-wht_label_width_no_scaled  = int(210)
-wht_label_height_no_scaled  = int(148)
-#""" Define distance of white and yellow pixels ==> use in defining random start pixel area """
-wht_dstnc_l_t_x_no_scaled  = int(25)
-wht_dstnc_l_t_y_no_scaled  = int(100)
-#"""YOLOv3 label ==> like label from https://pjreddie.com/darknet/yolo/ """
+wht_label_width_no_scaled = int(210)
+wht_label_height_no_scaled = int(148)
+# """ Define distance of white and yellow pixels ==> use in defining random start pixel area """
+wht_dstnc_l_t_x_no_scaled = int(25)
+wht_dstnc_l_t_y_no_scaled = int(100)
+# """YOLOv3 label ==> like label from https://pjreddie.com/darknet/yolo/ """
 # Todo draw box around yellow and white label including name == random string inside labels
-linestrength_YOLOv3_label_no_scaled  = int(2)
-heigth_naming_YOLOv3_label_no_scaled  = int(25)
-
-
+linestrength_YOLOv3_label_no_scaled = int(2)
+heigth_naming_YOLOv3_label_no_scaled = int(25)
 
 """ CLASSES setup for custom YOLOv3/YOLOv4 labelled (configured) dataset (VDA 4994 + ALPHANUMERIC)"""
 class_name_yellow_VDA = "yellow_VDA_label"
@@ -142,7 +141,6 @@ else:
 
 number_of_classes = len(class_names)
 
-
 """ get all image elements in current directory """
 # Sort Paths
 current_working_dir = f"Current directory: {Path.cwd()}"
@@ -152,9 +150,8 @@ home_dir = f"Home directory: {Path.home()}"
 
 # prints of paths
 print(path_to_training_images.__hash__())
-print(path_to_training_images)                  # windows path
-print(path_to_training_images.as_posix())       # linux path
-
+print(path_to_training_images)  # windows path
+print(path_to_training_images.as_posix())  # linux path
 
 # list of images in raw image path as jpg
 # just .jpg files
@@ -163,7 +160,7 @@ img_list_path_absolute = []
 for r, d, f in os.walk(path_to_training_images):
     for file in f:
         if file.endswith(".jpg"):
-            #print(os.path.join(r, file))
+            # print(os.path.join(r, file))
             img_list.append(file)
             # get absolute paths of images
             img_list_path_absolute.append(str(path_to_training_images) + "/" + file)
@@ -183,15 +180,11 @@ print(str(img_list_path_absolute[0]))
 # print(img_list_2)
 
 
-
-
-
-
 """ LOOP to Create VDA labels inside random base image"""
 # loop over all images in directory = load image [i]
 for i in range(len(img_list_path_absolute)):
 
-    #" n different labels per image"
+    # " n different labels per image"
     count = 0
 
     while count < number_of_images_per_basic_image:
@@ -226,15 +219,18 @@ for i in range(len(img_list_path_absolute)):
         """ Show image size """
         ##img = cv2.imread('../WC9 - 390Y.jpg')
         width_img, height_img, channels_img = img.shape[1], img.shape[0], img.shape[2]
-        print(img.shape, "\n width image:{} pixel \n heigth image:{} pixel \n channels image: {} channels".format(width_img, height_img, channels_img))
+        print(img.shape,
+              "\n width image:{} pixel \n heigth image:{} pixel \n channels image: {} channels".format(width_img,
+                                                                                                       height_img,
+                                                                                                       channels_img))
 
         """scaling (randomly) of VDA labels"""
         ## label size factors
         factor_size_labels = random.uniform(labels_random_size_ratio_min, labels_random_size_ratio_max)
-        factor_size_alphanumerics = random.uniform(alphanumeric_random_size_ratio_min, alphanumeric_random_size_ratio_max)
+        factor_size_alphanumerics = random.uniform(alphanumeric_random_size_ratio_min,
+                                                   alphanumeric_random_size_ratio_max)
         print("factor size labels = {}".format(factor_size_labels))
         print("factor size alphas = {}".format(factor_size_alphanumerics))
-
 
         """labels"""
         ## yellow VDA label:
@@ -250,14 +246,13 @@ for i in range(len(img_list_path_absolute)):
         # Todo draw box around yellow and white label including name == random string inside labels
         linestrength_YOLO_label = int(linestrength_YOLOv3_label_no_scaled * factor_size_labels)
         heigth_naming_YOLO_label = int(heigth_naming_YOLOv3_label_no_scaled * factor_size_labels)
-        #Todo: ensure no overlappings? Ensure label including full bounding box inside generated picture
-
+        # Todo: ensure no overlappings? Ensure label including full bounding box inside generated picture
 
         """Start drawing labels at random places but always inside picture (including factorization)
         FOR EACH LABEL SEPARATED"""
         """Calculated by hand (Case diffenece between 4k and FullHD"""
         ##Todo: random start of yellow label ===> decide whether 4K/FullHD ===> 4k between 0 and 3840-yl_label
-        #"""Differences in width and height 4K"""
+        # """Differences in width and height 4K"""
         # fourK_width_diff = fourK_width - yl_label_width + 2 * linestrength_YOLO_label
         # fourK_height_diff = fourK_height - (yl_label_height + heigth_naming_YOLO_label * 2 + linestrength_YOLO_label) #(yl_label_height + wht_dstnc_l_t_y + wht_label_height + heigth_naming_YOLO_label + linestrength_YOLO_label)
         # """Differences in width and height FullHD"""
@@ -269,24 +264,26 @@ for i in range(len(img_list_path_absolute)):
         # start_pxl_lft_tp_y = int(float(random.uniform(0, FullHD_height_diff)))
         # print("start pixel x is: {} and start pixel in y is: {}".format(start_pxl_lft_tp_x , start_pxl_lft_tp_y))
 
-
         """Auto Calculate Difference from loaded image (WITH OpenCV ==>> height, witdth channels) from shape (=size)"""
         auto_calc_start_pxl_lft_tp_x_range_yellow = img.shape[1] - (yl_label_width + 2 * linestrength_YOLO_label)
-        auto_calc_start_pxl_lft_tp_y_range_yellow = img.shape[0] -((yl_label_height + heigth_naming_YOLO_label * 2 + linestrength_YOLO_label))
+        auto_calc_start_pxl_lft_tp_y_range_yellow = img.shape[0] - ((yl_label_height + heigth_naming_YOLO_label * 2 + linestrength_YOLO_label))
+
         auto_calc_start_pxl_lft_tp_x_range_white = img.shape[1] - (yl_label_width + 2 * linestrength_YOLO_label)
         auto_calc_start_pxl_lft_tp_y_range_white = img.shape[0] - ((wht_label_height + heigth_naming_YOLO_label * 2 + linestrength_YOLO_label))
-        print(auto_calc_start_pxl_lft_tp_x_range_yellow, auto_calc_start_pxl_lft_tp_y_range_yellow, auto_calc_start_pxl_lft_tp_x_range_white,auto_calc_start_pxl_lft_tp_y_range_white)
+        print(auto_calc_start_pxl_lft_tp_x_range_yellow, auto_calc_start_pxl_lft_tp_y_range_yellow,
+              auto_calc_start_pxl_lft_tp_x_range_white, auto_calc_start_pxl_lft_tp_y_range_white)
 
         ## dependet on white label height
-        #auto_calc_start_pxl_lft_tp_y_range_white = img.shape[0] - (yl_label_height + wht_dstnc_l_t_y + wht_label_height + heigth_naming_YOLO_label * 2 + linestrength_YOLO_label)
+        # auto_calc_start_pxl_lft_tp_y_range_white = img.shape[0] - (yl_label_height + wht_dstnc_l_t_y + wht_label_height + heigth_naming_YOLO_label * 2 + linestrength_YOLO_label)
 
-        #"""TEST === > after in if conditional start fullHD"""
+        # """TEST === > after in if conditional start fullHD"""
         auto_calc_start_xl_lft_tp_x_yellow = int(float(random.uniform(0, auto_calc_start_pxl_lft_tp_x_range_yellow)))
         auto_calc_start_xl_lft_tp_y_yellow = int(float(random.uniform(0, auto_calc_start_pxl_lft_tp_y_range_yellow)))
 
         auto_calc_start_xl_lft_tp_x_white = int(float(random.uniform(0, auto_calc_start_pxl_lft_tp_x_range_white)))
         auto_calc_start_xl_lft_tp_y_white = int(float(random.uniform(0, auto_calc_start_pxl_lft_tp_y_range_white)))
-        print(auto_calc_start_xl_lft_tp_x_yellow, auto_calc_start_xl_lft_tp_y_yellow, auto_calc_start_xl_lft_tp_x_white, auto_calc_start_xl_lft_tp_y_white)
+        print(auto_calc_start_xl_lft_tp_x_yellow, auto_calc_start_xl_lft_tp_y_yellow, auto_calc_start_xl_lft_tp_x_white,
+              auto_calc_start_xl_lft_tp_y_white)
 
         """ALPHANUMERIC    CLASSES:    Generalized for alphanumeric"""
         # ## write classes:
@@ -363,6 +360,11 @@ for i in range(len(img_list_path_absolute)):
             string_filename_alphanum_complete = {}
             nmbr_alphanum = 0
 
+            boundbox_alphanum_top_x_list = []
+            boundbox_alphanum_top_y_list = []
+            boundbox_alphanum_bottom_x_list = []
+            boundbox_alphanum_bottom_y_list = []
+
             for nmbr_alphanum in range(number_printed_alphanumerical):
                 random_alphanumerical_key = random.randint(0, len(class_names_list_bydict) - 1)
                 # print(random_alphanumerical_key)
@@ -394,10 +396,9 @@ for i in range(len(img_list_path_absolute)):
                 # Draw the text
                 draw.text((auto_calc_start_alphanumeric_left_top_x,
                            auto_calc_start_alphanumeric_left_top_y - factor_size_alphanumerics * font_size_alphanumerics),
-                          value_random_alphanumerical, fill="black", font=font_pil, align ="left")
+                          value_random_alphanumerical, fill="black", font=font_pil, align="left")
                 # Get back the image to OpenCV
                 img = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)  # Even
-
 
                 string_filename_alphanum_complete[nmbr_alphanum] = value_random_alphanumerical
 
@@ -410,10 +411,18 @@ for i in range(len(img_list_path_absolute)):
 
                 boundbox_alphanum_top_x = int(auto_calc_start_alphanumeric_left_top_x)
                 boundbox_alphanum_top_y = int(auto_calc_start_alphanumeric_left_top_y - factor_size_alphanumerics * (font_size_alphanumerics))
-                boundbox_alphanum_bottom_x = int(auto_calc_start_alphanumeric_left_top_x + factor_size_alphanumerics * (font_size_alphanumerics-20))
+                boundbox_alphanum_bottom_x = int(auto_calc_start_alphanumeric_left_top_x + factor_size_alphanumerics * (font_size_alphanumerics - 20))
                 boundbox_alphanum_bottom_y = int(auto_calc_start_alphanumeric_left_top_y)
+
+
+
+                boundbox_alphanum_top_x_list.append(boundbox_alphanum_top_x)
+                boundbox_alphanum_top_y_list.append(boundbox_alphanum_top_y)
+                boundbox_alphanum_bottom_x_list.append(boundbox_alphanum_bottom_x)
+                boundbox_alphanum_bottom_y_list.append(boundbox_alphanum_bottom_y)
+
                 img = cv2.rectangle(img,
-                                    (boundbox_alphanum_top_x,boundbox_alphanum_top_y),
+                                    (boundbox_alphanum_top_x, boundbox_alphanum_top_y),
                                     (boundbox_alphanum_bottom_x, boundbox_alphanum_bottom_y),
                                     (B_val_alphanum, G_val_alphanum, R_val_alphanum),
                                     thickness=int(linestrength_YOLO_alphanumerics))
@@ -431,25 +440,27 @@ for i in range(len(img_list_path_absolute)):
                                               int(size_font_yolo_label_alphanum * factor_size_alphanumerics))
                 # Draw the text
                 draw.text((auto_calc_start_alphanumeric_left_top_x,
-                           (auto_calc_start_alphanumeric_left_top_y - ((font_size_alphanumerics+size_font_yolo_label_alphanum)*factor_size_alphanumerics))),
-                          value_random_alphanumerical, fill=(R_val_alphanum,G_val_alphanum, B_val_alphanum), font=font_pil)
+                           (auto_calc_start_alphanumeric_left_top_y - ((
+                                                                                   font_size_alphanumerics + size_font_yolo_label_alphanum) * factor_size_alphanumerics))),
+                          value_random_alphanumerical, fill=(R_val_alphanum, G_val_alphanum, B_val_alphanum),
+                          font=font_pil)
                 # Get back the image to OpenCV format
                 img = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
 
             filename_str_alpha_complete_list = []
             for key, value in string_filename_alphanum_complete.items():
-                    filename_str_alpha_complete_list.append(string_filename_alphanum_complete[key])
+                filename_str_alpha_complete_list.append(string_filename_alphanum_complete[key])
 
 
             def convert_list_to_string(org_list, seperator=' '):
                 """ Convert list to string, by joining all item in list with given separator.
                     Returns the concatenated string """
                 return seperator.join(org_list)
+
+
             # Convert list of strings to string
-            filename_alphanumeric_string_raw = convert_list_to_string(filename_str_alpha_complete_list,'_')
+            filename_alphanumeric_string_raw = convert_list_to_string(filename_str_alpha_complete_list, '_')
             print(filename_str_alpha_complete_list)
-
-
 
             """ SAVING IMAGE AND TEXT CORRECTLY for YOLOv3/v4 (11/2020) and SPLIT DATSET for CROSS-Validation"""
             """9. SAVE FILES CORRECTLY (to hand over to YOLO for custom training)"""
@@ -478,23 +489,24 @@ for i in range(len(img_list_path_absolute)):
             # plt.savefig(filename_str)
             plt.show()  # display it
 
-            """normalizing """
-            normalized_YOLO_alphanum_pxl_l_t_x = float(boundbox_alphanum_top_x / img.shape[1])
-            normalized_YOLO_alphanum_pxl_l_t_y = float(boundbox_alphanum_top_y / img.shape[0])
-            normalized_width_YOLO_alphanum = float((boundbox_alphanum_bottom_x - boundbox_alphanum_top_x) / img.shape[1])
-            normalized_heigth_YOLO_alphanum = float((boundbox_alphanum_bottom_y + boundbox_alphanum_top_y) / img.shape[0])
-
 
 
             """ write classes.names textfile for alphanumeric YOLO labelling"""
             # os.chdir(dataset_path)
             with open(dataset_path + '\ ' + filename_txt, 'w') as f:
-                for class_count in range(len(filename_str_alpha_complete_list)):
-                    YOLO_label_string_alphanum = str(filename_str_alpha_complete_list[class_count]) + " " + \
-                                              str(normalized_YOLO_alphanum_pxl_l_t_x) + " " + \
-                                              str(normalized_YOLO_alphanum_pxl_l_t_y) + " " + \
-                                              str(normalized_width_YOLO_alphanum) + " " + \
-                                              str(normalized_heigth_YOLO_alphanum)  # Odd
+                for class_count_alphanum in range(len(filename_str_alpha_complete_list)):
+                    width = float((boundbox_alphanum_bottom_x_list[class_count_alphanum] - boundbox_alphanum_top_x_list[class_count_alphanum]) / img.shape[1])
+                    """normalizing """
+                    normalized_YOLO_alphanum_pxl_l_t_x = max(0,float(boundbox_alphanum_top_x_list[class_count_alphanum] / img.shape[1]))
+                    normalized_YOLO_alphanum_pxl_l_t_y = max(0, float(boundbox_alphanum_top_y_list[class_count_alphanum] / img.shape[0]))
+                    normalized_width_YOLO_alphanum = max(0,float((boundbox_alphanum_bottom_x_list[class_count_alphanum] - boundbox_alphanum_top_x_list[class_count_alphanum]) / img.shape[1]))
+                    normalized_heigth_YOLO_alphanum = float((boundbox_alphanum_bottom_y_list[class_count_alphanum] + boundbox_alphanum_top_y_list[class_count_alphanum]) / img.shape[0])
+
+                    YOLO_label_string_alphanum = str(filename_str_alpha_complete_list[class_count_alphanum]) + " " + \
+                                                 str(normalized_YOLO_alphanum_pxl_l_t_x) + " " + \
+                                                 str(normalized_YOLO_alphanum_pxl_l_t_y) + " " + \
+                                                 str(normalized_width_YOLO_alphanum) + " " + \
+                                                 str(normalized_heigth_YOLO_alphanum)  # Odd
 
                     f.write(YOLO_label_string_alphanum)
                     f.write("\n")
@@ -502,9 +514,7 @@ for i in range(len(img_list_path_absolute)):
             complete_dataset.append([filename_str, filename_txt])
             complete_dataset_np = np.append(filename_str, filename_txt)
 
-
-
-            #count += 1
+            # count += 1
 
 
         else:
@@ -513,6 +523,7 @@ for i in range(len(img_list_path_absolute)):
                     Yellow label  dependend on random image pixels in range of image pixels
                           class number 0 for YOLO labelling
                     """
+
 
             def draw_yellow_VDA_label():
                 pass
@@ -550,7 +561,7 @@ for i in range(len(img_list_path_absolute)):
             label_4th_pos = random_text_gen(3, randomascii=False, uppercase=False, lowercase=False)
             label_5th_pos = random_text_gen(1, randomascii=False, uppercase=True)
             label_yellow_text_combined = '%s%s %s %s%s' % (
-            label_1st_pos, label_2nd_pos, label_3rd_pos, label_4th_pos, label_5th_pos)
+                label_1st_pos, label_2nd_pos, label_3rd_pos, label_4th_pos, label_5th_pos)
             print(label_yellow_text_combined)
 
             """ 4. define yellow Label Labels text positions"""
@@ -661,7 +672,8 @@ for i in range(len(img_list_path_absolute)):
             # Draw the text
             draw.text((txt_pos_yl_yolov3_label_x,
                        txt_pos_yl_yolov3_label_y - factor_size_labels * size_font_yolo_label_yellow),
-                      class_name_yellow_VDA, fill=(R_value_YOLOv3_label,G_value_YOLOv3_label, B_value_YOLOv3_label), font=font_pil)
+                      class_name_yellow_VDA, fill=(R_value_YOLOv3_label, G_value_YOLOv3_label, B_value_YOLOv3_label),
+                      font=font_pil)
 
             # Get back the image to OpenCV
             img = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
@@ -772,7 +784,7 @@ for i in range(len(img_list_path_absolute)):
             label_6th_pos = '-'
             label_7th_pos = random_text_gen(3, randomascii=False, uppercase=False, lowercase=False)
             label_white_number = '%s%s%s%s%s%s%s' % (
-            label_1st_pos, label_2nd_pos, label_3rd_pos, label_4th_pos, label_5th_pos, label_6th_pos, label_7th_pos)
+                label_1st_pos, label_2nd_pos, label_3rd_pos, label_4th_pos, label_5th_pos, label_6th_pos, label_7th_pos)
             # label_white_number = random_text_gen(10, randomascii=False, uppercase=False, lowercase=False)
             print(label_white_number)
             label_white_str = r'%s' % (label_white_number)
@@ -837,7 +849,7 @@ for i in range(len(img_list_path_absolute)):
                                 (YOLO_wht_pxl_r_b_x, YOLO_wht_pxl_r_b_y),
                                 (B_value_YOLOv3_wht_label, G_value_YOLOv3_wht_label, R_value_YOLOv3_wht_label),
 
-                     thickness=linestrength_YOLO_label)
+                                thickness=linestrength_YOLO_label)
             # # naming box
             # img = cv2.rectangle(img, (YOLOv3_wht_pxl_l_t_x_name, YOLOv3_wht_pxl_l_t_y_name),
             #                     (YOLOv3_wht_pxl_r_b_x_name, YOLOv3_wht_pxl_r_b_y_name),
@@ -860,7 +872,9 @@ for i in range(len(img_list_path_absolute)):
             # Draw the text
             draw.text((txt_pos_wht_yolov3_label_x,
                        txt_pos_wht_yolov3_label_y - factor_size_labels * size_font_yolo_label_white),
-                      class_name_white_VDA_4994, fill=(R_value_YOLOv3_wht_label,G_value_YOLOv3_wht_label,B_value_YOLOv3_wht_label), font=font_pil)
+                      class_name_white_VDA_4994,
+                      fill=(R_value_YOLOv3_wht_label, G_value_YOLOv3_wht_label, B_value_YOLOv3_wht_label),
+                      font=font_pil)
             # Get back the image to OpenCV format
             img = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
 
@@ -896,9 +910,9 @@ for i in range(len(img_list_path_absolute)):
             # class # pixel top left corne  r x bounding box # pixel top left corner y bounding box # width of box # height box
 
             """10 . normalizing pixel values yellow label"""
-            normalized_YOLOv3_pxl_l_t_x = float(YOLOv3_pxl_l_t_x / img.shape[1])
-            normalized_YOLOv3_pxl_l_t_y = float(YOLOv3_pxl_l_t_y / img.shape[0])
-            normalized_width_YOLO_label = float((yl_label_width + linestrength_YOLO_label) / img.shape[1])
+            normalized_YOLOv3_pxl_l_t_x = max(0,float(YOLOv3_pxl_l_t_x / img.shape[1]))
+            normalized_YOLOv3_pxl_l_t_y = max(0,float(YOLOv3_pxl_l_t_y / img.shape[0]))
+            normalized_width_YOLO_label = max(0,float((yl_label_width + linestrength_YOLO_label) / img.shape[1]))
             normalized_heigth_YOLO_label = float((yl_label_height + linestrength_YOLO_label) / img.shape[0])
             YOLO_label_string_yellow = str(class_number_yellow_VDA) + " " + \
                                        str(normalized_YOLOv3_pxl_l_t_x) + " " + \
@@ -907,9 +921,9 @@ for i in range(len(img_list_path_absolute)):
                                        str(normalized_heigth_YOLO_label)
 
             """normalizing pixel values white label"""
-            normalized_YOLOv3_white_pxl_l_t_x = float(YOLO_wht_pxl_l_t_x / img.shape[1])
-            normalized_YOLOv3_white_pxl_l_t_y = float(YOLO_wht_pxl_l_t_y / img.shape[0])
-            normalized_width_white_YOLO_label = float((wht_label_width + linestrength_YOLO_label) / img.shape[1])
+            normalized_YOLOv3_white_pxl_l_t_x = max(0,float(YOLO_wht_pxl_l_t_x / img.shape[1]))
+            normalized_YOLOv3_white_pxl_l_t_y = max(0, float(YOLO_wht_pxl_l_t_y / img.shape[0]))
+            normalized_width_white_YOLO_label = max(0,float((wht_label_width + linestrength_YOLO_label) / img.shape[1]))
             normalized_heigth_white_YOLO_label = float((wht_label_height + linestrength_YOLO_label) / img.shape[0])
             YOLO_label_string_white = str(class_number_white_VDA) + " " + \
                                       str(normalized_YOLOv3_white_pxl_l_t_x) + " " + \
@@ -917,31 +931,19 @@ for i in range(len(img_list_path_absolute)):
                                       str(normalized_width_white_YOLO_label) + " " + \
                                       str(normalized_heigth_white_YOLO_label)  # Odd
 
-
-
-
-
             """ write classes.names textfile for labels"""
-            #os.chdir(dataset_path)
+            # os.chdir(dataset_path)
             with open(dataset_path + '\ ' + filename_txt, 'w') as f:
                 f.write(YOLO_label_string_yellow)
                 f.write("\n")
                 f.write(YOLO_label_string_white)
 
-            #count += 1
+            # count += 1
 
-        count +=1
-
-
-
+        count += 1
 
         complete_dataset.append([filename_str, filename_txt])
-        complete_dataset_np = np.append(filename_str,filename_txt)
-
-
-
-
-
+        complete_dataset_np = np.append(filename_str, filename_txt)
 
 """11. create classes.txt each class to detect per line"""
 with open(dataset_path + '\classes.txt', 'w') as f:
@@ -949,9 +951,8 @@ with open(dataset_path + '\classes.txt', 'w') as f:
         f.write(class_names[classname])
         f.write("\n")
 
-
 """For GOOGLE DRIVE"""
-#path_google_drive_yolov4 =
+# path_google_drive_yolov4 =
 
 with open(dataset_path + '\obj.names', 'w') as f:
     for classname in range(len(class_names)):
@@ -970,11 +971,7 @@ with open(dataset_path + '\obj.data', 'w') as f:
     f.write("\n")
     f.write("backup = /mydrive/yolov{}/backup".format(yolo_version))
 
-
-
-
 ###############################################################################
-
 
 
 """"DATASET SPLIT (5 different Training-Test sets for cross-validation)"""
@@ -987,8 +984,9 @@ total_number_images = len(complete_dataset)
 print("Total number of images in dataset: {}".format(total_number_images))
 random.shuffle(complete_dataset)
 print("Shuffled dataset: {}".format(complete_dataset))
-number_splitted_data = int(total_number_images / (number_datasets -1) )
+number_splitted_data = int(total_number_images / (number_datasets - 1))
 print(number_splitted_data)
+
 
 def divide_chunks(list_data, size_chunk_data):
     # loop till length list
@@ -1001,26 +999,28 @@ chunked_list_complete_dataset_copy = list(divide_chunks(complete_dataset, number
 print(chunked_list_complete_dataset)
 print(len(chunked_list_complete_dataset))
 
-training_dataset_prt_1      = {}
-training_dataset_prt_2      = {}
-test_dataset                = {}
+training_dataset_prt_1 = {}
+training_dataset_prt_2 = {}
+test_dataset = {}
 training_dataset = {}
 
 # for k in range(len(chunked_list_complete_dataset)):
 #     #test_set = chunked_list_complete_dataset.pop([k])
 #     test_dataset[k] = chunked_list_complete_dataset[k]
 
-#for nmbr_of_chunk in chunked_list_complete_dataset:
+# for nmbr_of_chunk in chunked_list_complete_dataset:
 
 for f in range(len(chunked_list_complete_dataset)):
     print(len(chunked_list_complete_dataset))
     ## first testdatayet is last chunk and with every loop moves back to the first chunk
     if f == 0:
-        dataset_test = chunked_list_complete_dataset[len(chunked_list_complete_dataset)-1 - f]
-        dataset_train = chunked_list_complete_dataset[f:len(chunked_list_complete_dataset)-1]
+        dataset_test = chunked_list_complete_dataset[len(chunked_list_complete_dataset) - 1 - f]
+        dataset_train = chunked_list_complete_dataset[f:len(chunked_list_complete_dataset) - 1]
     else:
-        dataset_test = chunked_list_complete_dataset[len(chunked_list_complete_dataset)-1 - f]
-        dataset_train = chunked_list_complete_dataset[:len(chunked_list_complete_dataset) -1- f ]  + chunked_list_complete_dataset[len(chunked_list_complete_dataset)-1 -f + 1:]
+        dataset_test = chunked_list_complete_dataset[len(chunked_list_complete_dataset) - 1 - f]
+        dataset_train = chunked_list_complete_dataset[
+                        :len(chunked_list_complete_dataset) - 1 - f] + chunked_list_complete_dataset[
+                                                                       len(chunked_list_complete_dataset) - 1 - f + 1:]
     test_dataset[f] = dataset_test
     training_dataset[f] = dataset_train
 
@@ -1028,20 +1028,19 @@ for f in range(len(chunked_list_complete_dataset)):
     print(training_dataset)
     print(test_dataset)
 
-
 print(training_dataset)
 print(test_dataset)
-
-
 
 """ CREATE from all Data 5 Training - Test - datasets for cross-validation an mAP calculation"""
 from pathlib import WindowsPath
 from pathlib import PureWindowsPath
-## 1st. TRAINING DATASETS
-for key, value  in training_dataset.items():
 
-# 1st: Set current directory to folder underneath path of scripts to save all dataset images and textfiles"""
-    dataset_path_training_new = os.getcwd() + r'\yolov{}\Dataset_{}\obj'.format(yolo_version, key)  ## datafolder full created dataset for YOLOv3 / YOLOv4
+## 1st. TRAINING DATASETS
+for key, value in training_dataset.items():
+
+    # 1st: Set current directory to folder underneath path of scripts to save all dataset images and textfiles"""
+    dataset_path_training_new = os.getcwd() + r'\yolov{}\Dataset_{}\obj'.format(yolo_version,
+                                                                                key)  ## datafolder full created dataset for YOLOv3 / YOLOv4
     backup_folder_dir_for_trained_weights = os.getcwd() + r'\yolov{}\Dataset_{}\backup'.format(yolo_version, key)
     if not os.path.exists(dataset_path_training_new):
         os.makedirs(dataset_path_training_new)
@@ -1056,7 +1055,7 @@ for key, value  in training_dataset.items():
             os.makedirs(dataset_path_training_new)
 
     # copy classes.names, obj.data and obj.names into DATASET Folder
-    #class.names
+    # class.names
     source_path_class_names = dataset_path + r'\classes.txt'
     source_path_obj_data = dataset_path + r'\obj.data'
     source_path_obj_names = dataset_path + r'\obj.names'
@@ -1077,28 +1076,27 @@ for key, value  in training_dataset.items():
             for nmbr_single_file in range(len(file_duo_to_copy)):
                 single_file_to_copy = file_duo_to_copy[nmbr_single_file]
                 original_path = PurePath(dataset_path + r"\ {}".format(single_file_to_copy))
-                target_path = PurePath(dataset_path_training_new ) # r"\{}".format(single_file_to_copy))
+                target_path = PurePath(dataset_path_training_new)  # r"\{}".format(single_file_to_copy))
                 newPath = shutil.copy2(original_path, target_path)
-
 
     ## zip obj folder for training in cloud
     path_train_zip = os.getcwd() + r'\yolov{}\Dataset_{}\obj'.format(yolo_version, key)
-    root_dir_train_zip =  os.getcwd() + r'\yolov{}\Dataset_{}'.format(yolo_version, key)
+    root_dir_train_zip = os.getcwd() + r'\yolov{}\Dataset_{}'.format(yolo_version, key)
     base_dir_train_zip = 'obj'
     shutil.make_archive(path_train_zip, 'zip', root_dir_train_zip, base_dir_train_zip)
 
-
 ## 2nd TEST DATASETS
-for key, value  in test_dataset.items():
+for key, value in test_dataset.items():
     # 1st: Set current directory to folder underneath path of scripts to save all dataset images and textfiles"""
-    dataset_path_test_new = os.getcwd() + r'\yolov{}\Dataset_{}\test'.format(yolo_version, key)  ## datafolder full created dataset for YOLOv3 / YOLOv4
+    dataset_path_test_new = os.getcwd() + r'\yolov{}\Dataset_{}\test'.format(yolo_version,
+                                                                             key)  ## datafolder full created dataset for YOLOv3 / YOLOv4
     if not os.path.exists(dataset_path_test_new):
         os.makedirs(dataset_path_test_new)
     # 2nd remove old yolov4 dataset directory if exist
     else:
         current_working_dir = os.getcwd()
         directory_clean = Path(current_working_dir + r'\yolov{}\Dataset_{}\test'.format(yolo_version, key))
-        shutil.rmtree(directory_clean,ignore_errors=True)
+        shutil.rmtree(directory_clean, ignore_errors=True)
         # creat new directory
         if not os.path.exists(dataset_path_test_new):
             os.makedirs(dataset_path_test_new)
@@ -1115,7 +1113,7 @@ for key, value  in test_dataset.items():
         for nmbr_single_file in range(len(file_duo_to_copy)):
             single_file_to_copy = file_duo_to_copy[nmbr_single_file]
             original_path = PurePath(dataset_path + r"\ {}".format(single_file_to_copy))
-            target_path = PurePath(dataset_path_test_new ) # r"\{}".format(single_file_to_copy))
+            target_path = PurePath(dataset_path_test_new)  # r"\{}".format(single_file_to_copy))
             newPath = shutil.copy2(original_path, target_path)
 
     ## zip obj folder for training in cloud
@@ -1126,14 +1124,7 @@ for key, value  in test_dataset.items():
 ## create backup folder inside yolov4 folder
 
 
-
-
-
-
-
 ## last step =  zip whole yolo folder  and transfer to Google drive
-
-
 
 
 # for r, d, f in os.walk(path_to_training_images):
@@ -1151,23 +1142,8 @@ for key, value  in test_dataset.items():
 3. drag obj.zip to yolov3 folder in GoogleDrive
 """
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 """ HELPER FUNCTIONS"""
-#""" text generator"""
+# """ text generator"""
 # def random_text_gen(length=32, randomascii=True, uppercase=True, lowercase=True, numbers=True):
 #     character_set = ''  # lowercase, uppercase, digits etc. possible
 #     if randomascii:
@@ -1197,39 +1173,37 @@ for key, value  in test_dataset.items():
 #            bottomLeftOrigin=True)
 
 
+# if __name__ == "__main__":
+# print_labels_on_image(img)
 
+# """ random label text generator"""
+# label_1st_pos = random_text_gen(2,randomascii=False, uppercase=True)
+# label_2nd_pos = random_text_gen(1, randomascii=False, uppercase=False, lowercase=False)
+# label_3rd_pos = '-'
+# label_4th_pos = random_text_gen(3, randomascii=False, uppercase=False, lowercase=False)
+# label_5th_pos = random_text_gen(1,randomascii=False, uppercase=True)
+# label_yellow_text_combined = '%s%s %s %s%s' %(label_1st_pos, label_2nd_pos, label_3rd_pos, label_4th_pos, label_5th_pos)
+# print(label_yellow_text_combined)
+# label_white_number = random_text_gen(10, randomascii=False, uppercase=False, lowercase=False)
+# print(label_white_number)
+# label_white_str = '%s' %(label_white_number)
+#
+# font = cv2.FONT_HERSHEY_SIMPLEX
+# cv2.putText(img, label_yellow_text_combined, (txt_pos_blyl_x, txt_pos_blyl_y), font, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+# cv2.putText(img, random_text_gen(2, randomascii=False, uppercase=False, lowercase=False), (txt_pos_ylbl_x, txt_pos_ylbl_y), font, 1, (yl_col_B,yl_col_G, yl_col_R), 2, cv2.LINE_AA)
+# cv2.putText(img, label_white_number, (txt_pos_wh_x, txt_pos_wh_y), font, 0.8, (0, 0, 0), 2, cv2.LINE_AA)
+#
+# #Todo write  more variables in string in filename for picture name and opencv operation
+# """ show and write image """
+# #print(img)
+# filename_str = '%s --- %s.jpg' %(label_yellow_text_combined, label_white_str)
+# print(filename_str)
+# cv2.imwrite(filename_str, img)
+# cv2.imshow('Dataset_VDA_labels', img)
+# cv2.waitKey(0) & 0xFF
+# cv2.destroyAllWindows()
 
-#if __name__ == "__main__":
-    #print_labels_on_image(img)
-
-    # """ random label text generator"""
-    # label_1st_pos = random_text_gen(2,randomascii=False, uppercase=True)
-    # label_2nd_pos = random_text_gen(1, randomascii=False, uppercase=False, lowercase=False)
-    # label_3rd_pos = '-'
-    # label_4th_pos = random_text_gen(3, randomascii=False, uppercase=False, lowercase=False)
-    # label_5th_pos = random_text_gen(1,randomascii=False, uppercase=True)
-    # label_yellow_text_combined = '%s%s %s %s%s' %(label_1st_pos, label_2nd_pos, label_3rd_pos, label_4th_pos, label_5th_pos)
-    # print(label_yellow_text_combined)
-    # label_white_number = random_text_gen(10, randomascii=False, uppercase=False, lowercase=False)
-    # print(label_white_number)
-    # label_white_str = '%s' %(label_white_number)
-    #
-    # font = cv2.FONT_HERSHEY_SIMPLEX
-    # cv2.putText(img, label_yellow_text_combined, (txt_pos_blyl_x, txt_pos_blyl_y), font, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-    # cv2.putText(img, random_text_gen(2, randomascii=False, uppercase=False, lowercase=False), (txt_pos_ylbl_x, txt_pos_ylbl_y), font, 1, (yl_col_B,yl_col_G, yl_col_R), 2, cv2.LINE_AA)
-    # cv2.putText(img, label_white_number, (txt_pos_wh_x, txt_pos_wh_y), font, 0.8, (0, 0, 0), 2, cv2.LINE_AA)
-    #
-    # #Todo write  more variables in string in filename for picture name and opencv operation
-    # """ show and write image """
-    # #print(img)
-    # filename_str = '%s --- %s.jpg' %(label_yellow_text_combined, label_white_str)
-    # print(filename_str)
-    #cv2.imwrite(filename_str, img)
-    # cv2.imshow('Dataset_VDA_labels', img)
-    # cv2.waitKey(0) & 0xFF
-    # cv2.destroyAllWindows()
-
-#""" text generator"""
+# """ text generator"""
 # def random_text_gen(length=32, randomascii=True, uppercase=True, lowercase=True, numbers=True):
 #     character_set = ''                                                                          # lowercase, uppercase, digits etc. possile
 #     if randomascii:
@@ -1243,9 +1217,9 @@ for key, value  in test_dataset.items():
 #
 #     return ''.join(random.choice(character_set) for i in range(length))
 
-#"""Brown box """
+# """Brown box """
 # """brown box hardcoded at startpixel"""
-    # pxl_l_t_x = 300                                             # pixel left top x
+# pxl_l_t_x = 300                                             # pixel left top x
 # pxl_l_t_y = 200
 # brown_width = 600
 # brown_height = 400                                          # left top y
@@ -1260,25 +1234,24 @@ for key, value  in test_dataset.items():
 # # yl_pxl_l_t_x = pxl_l_t_x + yl_dstnc_l_t_x                      # pixel left top
 # # yl_pxl_l_t_y = pxl_l_t_y + yl_dstnc_l_t_y#
 
-#"""diagonal blue line with thickness of 5px2"""
-    # img3 = cv2.line(img3, (0,0), (511,511), (255,0,0), 5)
+# """diagonal blue line with thickness of 5px2"""
+# img3 = cv2.line(img3, (0,0), (511,511), (255,0,0), 5)
 
 
-    ### write into image  Adding Text to Images:
+### write into image  Adding Text to Images:
 
-    # To put texts in images, you need specify following things.
-    #
-    #         Text data that you want to write
-    #         Position coordinates of where you want put it (i.e. bottom-left corner where data starts).
-    #         Font type (Check cv2.putText() docs for supported fonts)
-    #         Font Scale (specifies the size of font)
-    #         regular things like color, thickness, lineType etc. For better look, lineType = cv2.LINE_AA is recommended.
+# To put texts in images, you need specify following things.
+#
+#         Text data that you want to write
+#         Position coordinates of where you want put it (i.e. bottom-left corner where data starts).
+#         Font type (Check cv2.putText() docs for supported fonts)
+#         Font Scale (specifies the size of font)
+#         regular things like color, thickness, lineType etc. For better look, lineType = cv2.LINE_AA is recommended.
 
 
 # Todo yellow VDA label with YOLOv3 label
 """Yellow label  dependend on random image pixels in range of image pixels
 class number 0 for YOLO labelling"""
-
 
 # def yellow_label_pixels():
 #     pass
