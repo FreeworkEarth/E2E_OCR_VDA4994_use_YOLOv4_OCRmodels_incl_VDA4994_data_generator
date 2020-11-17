@@ -66,7 +66,7 @@ complete_dataset = [[]]
 complete_datset_np = np.array([], [])
 
 font = cv2.FONT_HERSHEY_SIMPLEX  # OpenCV font
-number_of_images_per_basic_image = 2  # how many images are printed for each backround image
+number_of_images_per_basic_image =2   # how many images are printed for each backround image
 white_depend_on_yellow_label = False  # if white and yellow label are always in the same difference to each other
 
 labels_random_size_ratio_min = 0.2  # min 0.1
@@ -409,12 +409,10 @@ for i in range(len(img_list_path_absolute)):
                 G_val_alphanum = 36
                 R_val_alphanum = 100
 
-                boundbox_alphanum_top_x = int(auto_calc_start_alphanumeric_left_top_x)
-                boundbox_alphanum_top_y = int(auto_calc_start_alphanumeric_left_top_y - factor_size_alphanumerics * (font_size_alphanumerics))
-                boundbox_alphanum_bottom_x = int(auto_calc_start_alphanumeric_left_top_x + factor_size_alphanumerics * (font_size_alphanumerics - 20))
-                boundbox_alphanum_bottom_y = int(auto_calc_start_alphanumeric_left_top_y)
-
-
+                boundbox_alphanum_top_x = max(0,int(auto_calc_start_alphanumeric_left_top_x))
+                boundbox_alphanum_top_y = max(0,int(auto_calc_start_alphanumeric_left_top_y - factor_size_alphanumerics * (font_size_alphanumerics)))
+                boundbox_alphanum_bottom_x = min(int(auto_calc_start_alphanumeric_left_top_x + factor_size_alphanumerics * (font_size_alphanumerics - 20)),width_img)
+                boundbox_alphanum_bottom_y = min(int(auto_calc_start_alphanumeric_left_top_y),image_height)
 
                 boundbox_alphanum_top_x_list.append(boundbox_alphanum_top_x)
                 boundbox_alphanum_top_y_list.append(boundbox_alphanum_top_y)
@@ -494,13 +492,34 @@ for i in range(len(img_list_path_absolute)):
             """ write classes.names textfile for alphanumeric YOLO labelling"""
             # os.chdir(dataset_path)
             with open(dataset_path + '\ ' + filename_txt, 'w') as f:
+                normalized_YOLO_alphanum_pxl_l_t_x_list = []
+                normalized_YOLO_alphanum_pxl_l_t_y_list = []
+                normalized_YOLO_alphanum_width_list = []
+                normalized_YOLO_alphanum_heigth_list = []
+
                 for class_count_alphanum in range(len(filename_str_alpha_complete_list)):
                     width = float((boundbox_alphanum_bottom_x_list[class_count_alphanum] - boundbox_alphanum_top_x_list[class_count_alphanum]) / img.shape[1])
                     """normalizing """
-                    normalized_YOLO_alphanum_pxl_l_t_x = max(0,float(boundbox_alphanum_top_x_list[class_count_alphanum] / img.shape[1]))
-                    normalized_YOLO_alphanum_pxl_l_t_y = max(0, float(boundbox_alphanum_top_y_list[class_count_alphanum] / img.shape[0]))
-                    normalized_width_YOLO_alphanum = max(0,float((boundbox_alphanum_bottom_x_list[class_count_alphanum] - boundbox_alphanum_top_x_list[class_count_alphanum]) / img.shape[1]))
-                    normalized_heigth_YOLO_alphanum = float((boundbox_alphanum_bottom_y_list[class_count_alphanum] + boundbox_alphanum_top_y_list[class_count_alphanum]) / img.shape[0])
+                    # normalized_YOLO_alphanum_pxl_l_t_x = max(0,float(boundbox_alphanum_top_x_list[class_count_alphanum] / img.shape[1]))
+                    # normalized_YOLO_alphanum_pxl_l_t_y = max(0, float(boundbox_alphanum_top_y_list[class_count_alphanum] / img.shape[0]))
+                    # normalized_width_YOLO_alphanum = max(0,float((boundbox_alphanum_bottom_x_list[class_count_alphanum] - boundbox_alphanum_top_x_list[class_count_alphanum]) / img.shape[1]))
+                    # normalized_heigth_YOLO_alphanum = float((boundbox_alphanum_bottom_y_list[class_count_alphanum] + boundbox_alphanum_top_y_list[class_count_alphanum]) / img.shape[0])
+                    normalized_YOLO_alphanum_pxl_l_t_x = float(
+                        boundbox_alphanum_top_x_list[class_count_alphanum] / img.shape[1])
+                    normalized_YOLO_alphanum_pxl_l_t_y = float(
+                        boundbox_alphanum_top_y_list[class_count_alphanum] / img.shape[0])
+                    normalized_width_YOLO_alphanum = float((boundbox_alphanum_bottom_x_list[
+                                                                       class_count_alphanum] -
+                                                                   boundbox_alphanum_top_x_list[class_count_alphanum]) /
+                                                                  img.shape[1])
+                    normalized_heigth_YOLO_alphanum = float((boundbox_alphanum_bottom_y_list[class_count_alphanum] -
+                                                             boundbox_alphanum_top_y_list[class_count_alphanum]) /
+                                                            img.shape[0])
+
+                    normalized_YOLO_alphanum_pxl_l_t_x_list.append(normalized_YOLO_alphanum_pxl_l_t_x)
+                    normalized_YOLO_alphanum_pxl_l_t_y_list.append(normalized_YOLO_alphanum_pxl_l_t_y)
+                    normalized_YOLO_alphanum_width_list.append(normalized_width_YOLO_alphanum)
+                    normalized_YOLO_alphanum_heigth_list.append(normalized_heigth_YOLO_alphanum)
 
                     YOLO_label_string_alphanum = str(filename_str_alpha_complete_list[class_count_alphanum]) + " " + \
                                                  str(normalized_YOLO_alphanum_pxl_l_t_x) + " " + \
