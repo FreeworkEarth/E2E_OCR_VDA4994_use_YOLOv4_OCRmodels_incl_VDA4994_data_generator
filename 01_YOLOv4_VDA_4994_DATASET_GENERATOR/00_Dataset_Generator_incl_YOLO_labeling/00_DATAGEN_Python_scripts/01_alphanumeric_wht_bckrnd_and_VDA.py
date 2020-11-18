@@ -66,7 +66,7 @@ complete_dataset = [[]]
 complete_datset_np = np.array([], [])
 
 font = cv2.FONT_HERSHEY_SIMPLEX  # OpenCV font
-number_of_images_per_basic_image =2   # how many images are printed for each backround image
+number_of_images_per_basic_image = 15   # how many images are printed for each backround image
 white_depend_on_yellow_label = False  # if white and yellow label are always in the same difference to each other
 
 labels_random_size_ratio_min = 0.2  # min 0.1
@@ -120,6 +120,8 @@ wht_dstnc_l_t_y_no_scaled = int(100)
 # Todo draw box around yellow and white label including name == random string inside labels
 linestrength_YOLOv3_label_no_scaled = int(2)
 heigth_naming_YOLOv3_label_no_scaled = int(25)
+
+
 
 """ CLASSES setup for custom YOLOv3/YOLOv4 labelled (configured) dataset (VDA 4994 + ALPHANUMERIC)"""
 class_name_yellow_VDA = "yellow_VDA_label"
@@ -365,11 +367,14 @@ for i in range(len(img_list_path_absolute)):
             boundbox_alphanum_bottom_x_list = []
             boundbox_alphanum_bottom_y_list = []
 
+            value_random_alphanumerical_list = []
             for nmbr_alphanum in range(number_printed_alphanumerical):
+
                 random_alphanumerical_key = random.randint(0, len(class_names_list_bydict) - 1)
                 # print(random_alphanumerical_key)
 
                 value_random_alphanumerical = dict_classes_alphanumeric[random_alphanumerical_key]
+                value_random_alphanumerical_list.append(value_random_alphanumerical)
                 print(value_random_alphanumerical)
 
                 ### starting left top alphanumeric
@@ -521,7 +526,13 @@ for i in range(len(img_list_path_absolute)):
                     normalized_YOLO_alphanum_width_list.append(normalized_width_YOLO_alphanum)
                     normalized_YOLO_alphanum_heigth_list.append(normalized_heigth_YOLO_alphanum)
 
-                    YOLO_label_string_alphanum = str(filename_str_alpha_complete_list[class_count_alphanum]) + " " + \
+                    value_index_search = value_random_alphanumerical_list[class_count_alphanum]
+                    index_class_value_alphanum = class_names.index(value_index_search)
+                    index_add = number_of_classes - len(alphanumeric_list)
+
+                    #string_value_class = class_names.index(value_index_search) + (number_of_classes - (len(alphanumeric_list) - 1))
+
+                    YOLO_label_string_alphanum = str(index_class_value_alphanum) + " " + \
                                                  str(normalized_YOLO_alphanum_pxl_l_t_x) + " " + \
                                                  str(normalized_YOLO_alphanum_pxl_l_t_y) + " " + \
                                                  str(normalized_width_YOLO_alphanum) + " " + \
@@ -933,7 +944,7 @@ for i in range(len(img_list_path_absolute)):
             normalized_YOLOv3_pxl_l_t_y = max(0,float(YOLOv3_pxl_l_t_y / img.shape[0]))
             normalized_width_YOLO_label = max(0,float((yl_label_width + linestrength_YOLO_label) / img.shape[1]))
             normalized_heigth_YOLO_label = float((yl_label_height + linestrength_YOLO_label) / img.shape[0])
-            YOLO_label_string_yellow = str(class_number_yellow_VDA) + " " + \
+            YOLO_label_string_yellow = str(class_names.index("yellow_VDA_label")) + " " + \
                                        str(normalized_YOLOv3_pxl_l_t_x) + " " + \
                                        str(normalized_YOLOv3_pxl_l_t_y) + " " + \
                                        str(normalized_width_YOLO_label) + " " + \
@@ -944,7 +955,8 @@ for i in range(len(img_list_path_absolute)):
             normalized_YOLOv3_white_pxl_l_t_y = max(0, float(YOLO_wht_pxl_l_t_y / img.shape[0]))
             normalized_width_white_YOLO_label = max(0,float((wht_label_width + linestrength_YOLO_label) / img.shape[1]))
             normalized_heigth_white_YOLO_label = float((wht_label_height + linestrength_YOLO_label) / img.shape[0])
-            YOLO_label_string_white = str(class_number_white_VDA) + " " + \
+
+            YOLO_label_string_white = str(class_names.index("white_VDA_4994_label")) + " " + \
                                       str(normalized_YOLOv3_white_pxl_l_t_x) + " " + \
                                       str(normalized_YOLOv3_white_pxl_l_t_y) + " " + \
                                       str(normalized_width_white_YOLO_label) + " " + \
@@ -1050,7 +1062,7 @@ for f in range(len(chunked_list_complete_dataset)):
 print(training_dataset)
 print(test_dataset)
 
-""" CREATE from all Data 5 Training - Test - datasets for cross-validation an mAP calculation"""
+""" CREATE from complete dataset multiple  Training - Test - datasets for cross-validation an mAP calculation"""
 from pathlib import WindowsPath
 from pathlib import PureWindowsPath
 
