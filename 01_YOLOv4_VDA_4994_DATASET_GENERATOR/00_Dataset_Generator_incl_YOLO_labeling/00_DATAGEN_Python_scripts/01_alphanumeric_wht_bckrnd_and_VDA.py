@@ -56,8 +56,8 @@ import qrcode
 yolo_version = 4
 
 # image path setup ( here: in 01_4k_images_raw/00_Raw_images_4k)
-#path_to_training_images = Path(r"C:\Users\chari\Google Drive\00_Masterthesis\Masterarbeit\000_CODE\Git\01_YOLOv4_VDA_4994_DATASET_GENERATOR\00_Dataset_Generator_incl_YOLO_labeling\01_4k_images_raw\00_Raw_images_4K")  ## ipath to raw images from repo
-path_to_training_images = Path(r"C:\Users\chari\Google Drive\00_Masterthesis\Masterarbeit\000_CODE\Git\01_YOLOv4_VDA_4994_DATASET_GENERATOR\00_Dataset_Generator_incl_YOLO_labeling\01_4k_images_raw\xxx_Test_for_Image_generator")  ## ipath to raw images from repo
+path_to_training_images = Path(r"C:\Users\chari\Google Drive\00_Masterthesis\Masterarbeit\000_CODE\Git\01_YOLOv4_VDA_4994_DATASET_GENERATOR\00_Dataset_Generator_incl_YOLO_labeling\01_4k_images_raw\00_Raw_images_4K")  ## ipath to raw images from repo#
+#path_to_training_images = Path(r"C:\Users\chari\Google Drive\00_Masterthesis\Masterarbeit\000_CODE\Git\01_YOLOv4_VDA_4994_DATASET_GENERATOR\00_Dataset_Generator_incl_YOLO_labeling\01_4k_images_raw\xxx_Test_for_Image_generator")  ## ipath to raw images from repo
 
 image_resolution = "FullHD"  # "FullHD"  or 4K      ____4096 × 2160 (full frame, 256∶135 or ≈1.90∶1 aspect ratio)
 
@@ -239,8 +239,8 @@ for i in range(len(img_list_path_absolute)):
         yl_label_width = int(yl_label_width_no_scaled_4k * factor_size_labels)
         yl_label_height = int(yl_label_height_no_scaled * factor_size_labels)
         ## white VDA label
-        wht_label_width = int(wht_label_width_no_scaled * factor_size_labels)
-        wht_label_height = int(wht_label_height_no_scaled * factor_size_labels)
+        wht_label_width_scaled = int(wht_label_width_no_scaled * factor_size_labels)
+        wht_label_height_scaled = int(wht_label_height_no_scaled * factor_size_labels)
         # """ Define distance of white and yellow pixels ==> use in defining random start pixel area """
         wht_dstnc_l_t_x = int(wht_dstnc_l_t_x_no_scaled * factor_size_labels)
         wht_dstnc_l_t_y = int(wht_dstnc_l_t_y_no_scaled * factor_size_labels)
@@ -256,10 +256,10 @@ for i in range(len(img_list_path_absolute)):
         ##Todo: random start of yellow label ===> decide whether 4K/FullHD ===> 4k between 0 and 3840-yl_label
         # """Differences in width and height 4K"""
         # fourK_width_diff = fourK_width - yl_label_width + 2 * linestrength_YOLO_label
-        # fourK_height_diff = fourK_height - (yl_label_height + heigth_naming_YOLO_label * 2 + linestrength_YOLO_label) #(yl_label_height + wht_dstnc_l_t_y + wht_label_height + heigth_naming_YOLO_label + linestrength_YOLO_label)
+        # fourK_height_diff = fourK_height - (yl_label_height + heigth_naming_YOLO_label * 2 + linestrength_YOLO_label) #(yl_label_height + wht_dstnc_l_t_y + wht_label_height_scaled + heigth_naming_YOLO_label + linestrength_YOLO_label)
         # """Differences in width and height FullHD"""
         # FullHD_width_diff = FullHD_width - yl_label_width + 2 * linestrength_YOLO_label
-        # FullHD_height_diff = FullHD_height - (yl_label_height + wht_dstnc_l_t_y + wht_label_height + heigth_naming_YOLO_label + linestrength_YOLO_label)
+        # FullHD_height_diff = FullHD_height - (yl_label_height + wht_dstnc_l_t_y + wht_label_height_scaled + heigth_naming_YOLO_label + linestrength_YOLO_label)
         # print(fourK_width_diff,fourK_height_diff,FullHD_width_diff, FullHD_height_diff)
         """starting pixels"""
         # start_pxl_lft_tp_x = int(float(random.uniform(0, FullHD_width_diff)))
@@ -271,12 +271,12 @@ for i in range(len(img_list_path_absolute)):
         auto_calc_start_pxl_lft_tp_y_range_yellow = img.shape[0] - ((yl_label_height + heigth_naming_YOLO_label * 2 + linestrength_YOLO_label))
 
         auto_calc_start_pxl_lft_tp_x_range_white = img.shape[1] - (yl_label_width + 2 * linestrength_YOLO_label)
-        auto_calc_start_pxl_lft_tp_y_range_white = img.shape[0] - ((wht_label_height + heigth_naming_YOLO_label * 2 + linestrength_YOLO_label))
+        auto_calc_start_pxl_lft_tp_y_range_white = img.shape[0] - ((wht_label_height_scaled + heigth_naming_YOLO_label * 2 + linestrength_YOLO_label))
         print(auto_calc_start_pxl_lft_tp_x_range_yellow, auto_calc_start_pxl_lft_tp_y_range_yellow,
               auto_calc_start_pxl_lft_tp_x_range_white, auto_calc_start_pxl_lft_tp_y_range_white)
 
         ## dependet on white label height
-        # auto_calc_start_pxl_lft_tp_y_range_white = img.shape[0] - (yl_label_height + wht_dstnc_l_t_y + wht_label_height + heigth_naming_YOLO_label * 2 + linestrength_YOLO_label)
+        # auto_calc_start_pxl_lft_tp_y_range_white = img.shape[0] - (yl_label_height + wht_dstnc_l_t_y + wht_label_height_scaled + heigth_naming_YOLO_label * 2 + linestrength_YOLO_label)
 
         # """TEST === > after in if conditional start fullHD"""
         auto_calc_start_xl_lft_tp_x_yellow = int(float(random.uniform(0, auto_calc_start_pxl_lft_tp_x_range_yellow)))
@@ -318,10 +318,14 @@ for i in range(len(img_list_path_absolute)):
 
         """alphanumeric OR VDA label"""
         if count % 2 == 0:
-            """ white backround"""
+            """ white backround all 2 alphanumeric images"""
+            white_bckrnd_range = number_of_images_per_basic_image/2
+            if count <  white_bckrnd_range:
             ## draw White backround for alphanumerics
-            img = cv2.rectangle(img, (0, 0), (image_width, image_height),
-                                (wht_col_B, wht_col_G, wht_col_R), -1)
+                img = cv2.rectangle(img, (0, 0), (image_width, image_height),
+                                    (wht_col_B, wht_col_G, wht_col_R), -1)
+            else:
+                pass
             dict_classes_alphanumeric = {}
             class_names_list = []
             class_values_list_string = []
@@ -407,8 +411,8 @@ for i in range(len(img_list_path_absolute)):
 
                 string_filename_alphanum_complete[nmbr_alphanum] = value_random_alphanumerical
 
-                """ draw YOLO bounding boxes"""
-                # YOLOv bounding box white Label
+                """  YOLO bounding boxes"""
+                # YOLOv bounding box alphanum
                 linestrength_YOLO_alphanumerics = 1
                 B_val_alphanum = 114
                 G_val_alphanum = 36
@@ -424,11 +428,11 @@ for i in range(len(img_list_path_absolute)):
                 boundbox_alphanum_bottom_x_list.append(boundbox_alphanum_bottom_x)
                 boundbox_alphanum_bottom_y_list.append(boundbox_alphanum_bottom_y)
 
-                img = cv2.rectangle(img,
-                                    (boundbox_alphanum_top_x, boundbox_alphanum_top_y),
-                                    (boundbox_alphanum_bottom_x, boundbox_alphanum_bottom_y),
-                                    (B_val_alphanum, G_val_alphanum, R_val_alphanum),
-                                    thickness=int(linestrength_YOLO_alphanumerics))
+                # img = cv2.rectangle(img,
+                #                     (boundbox_alphanum_top_x, boundbox_alphanum_top_y),
+                #                     (boundbox_alphanum_bottom_x, boundbox_alphanum_bottom_y),
+                #                     (B_val_alphanum, G_val_alphanum, R_val_alphanum),
+                #                     thickness=int(linestrength_YOLO_alphanumerics))
 
                 # """ Write classname into boxes"""
                 ## pillow
@@ -442,11 +446,11 @@ for i in range(len(img_list_path_absolute)):
                 font_pil = ImageFont.truetype("arial.ttf",
                                               int(size_font_yolo_label_alphanum * factor_size_alphanumerics))
                 # Draw the text
-                draw.text((auto_calc_start_alphanumeric_left_top_x,
-                           (auto_calc_start_alphanumeric_left_top_y - ((
-                                                                                   font_size_alphanumerics + size_font_yolo_label_alphanum) * factor_size_alphanumerics))),
-                          value_random_alphanumerical, fill=(R_val_alphanum, G_val_alphanum, B_val_alphanum),
-                          font=font_pil)
+                # draw.text((auto_calc_start_alphanumeric_left_top_x,
+                #            (auto_calc_start_alphanumeric_left_top_y - ((
+                #                                                                    font_size_alphanumerics + size_font_yolo_label_alphanum) * factor_size_alphanumerics))),
+                #           value_random_alphanumerical, fill=(R_val_alphanum, G_val_alphanum, B_val_alphanum),
+                #           font=font_pil)
                 # Get back the image to OpenCV format
                 img = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
 
@@ -509,17 +513,10 @@ for i in range(len(img_list_path_absolute)):
                     # normalized_YOLO_alphanum_pxl_l_t_y = max(0, float(boundbox_alphanum_top_y_list[class_count_alphanum] / img.shape[0]))
                     # normalized_width_YOLO_alphanum = max(0,float((boundbox_alphanum_bottom_x_list[class_count_alphanum] - boundbox_alphanum_top_x_list[class_count_alphanum]) / img.shape[1]))
                     # normalized_heigth_YOLO_alphanum = float((boundbox_alphanum_bottom_y_list[class_count_alphanum] + boundbox_alphanum_top_y_list[class_count_alphanum]) / img.shape[0])
-                    normalized_YOLO_alphanum_pxl_l_t_x = float(
-                        boundbox_alphanum_top_x_list[class_count_alphanum] / img.shape[1])
-                    normalized_YOLO_alphanum_pxl_l_t_y = float(
-                        boundbox_alphanum_top_y_list[class_count_alphanum] / img.shape[0])
-                    normalized_width_YOLO_alphanum = float((boundbox_alphanum_bottom_x_list[
-                                                                       class_count_alphanum] -
-                                                                   boundbox_alphanum_top_x_list[class_count_alphanum]) /
-                                                                  img.shape[1])
-                    normalized_heigth_YOLO_alphanum = float((boundbox_alphanum_bottom_y_list[class_count_alphanum] -
-                                                             boundbox_alphanum_top_y_list[class_count_alphanum]) /
-                                                            img.shape[0])
+                    normalized_YOLO_alphanum_pxl_l_t_x = float(boundbox_alphanum_top_x_list[class_count_alphanum] / img.shape[1])
+                    normalized_YOLO_alphanum_pxl_l_t_y = float(boundbox_alphanum_top_y_list[class_count_alphanum] / img.shape[0])
+                    normalized_width_YOLO_alphanum = float((boundbox_alphanum_bottom_x_list[class_count_alphanum] - boundbox_alphanum_top_x_list[class_count_alphanum]) /img.shape[1])
+                    normalized_heigth_YOLO_alphanum = float((boundbox_alphanum_bottom_y_list[class_count_alphanum] - boundbox_alphanum_top_y_list[class_count_alphanum]) /img.shape[0])
 
                     normalized_YOLO_alphanum_pxl_l_t_x_list.append(normalized_YOLO_alphanum_pxl_l_t_x)
                     normalized_YOLO_alphanum_pxl_l_t_y_list.append(normalized_YOLO_alphanum_pxl_l_t_y)
@@ -675,11 +672,11 @@ for i in range(len(img_list_path_absolute)):
             txt_pos_yl_yolov3_label_x = YOLOv3_pxl_l_t_x + txt_yolo_yl_dstnc_x
             txt_pos_yl_yolov3_label_y = YOLOv3_pxl_l_t_y - txt_yolo_yl_dstnc_y
 
-            """ 7. Draw YOLO bounding boxes"""
+            """ 7.  YOLO bounding boxes"""
             # YOLOv3 bounding box Yellow Label
-            img = cv2.rectangle(img, (YOLOv3_pxl_l_t_x, YOLOv3_pxl_l_t_y), (YOLOv3_pxl_r_b_x, YOLOv3_pxl_r_b_y),
-                                (B_value_YOLOv3_label, G_value_YOLOv3_label, R_value_YOLOv3_label),
-                                thickness=linestrength_YOLO_label)
+            # img = cv2.rectangle(img, (YOLOv3_pxl_l_t_x, YOLOv3_pxl_l_t_y), (YOLOv3_pxl_r_b_x, YOLOv3_pxl_r_b_y),
+            #                     (B_value_YOLOv3_label, G_value_YOLOv3_label, R_value_YOLOv3_label),
+            #                     thickness=linestrength_YOLO_label)
             # # naming box
             # img = cv2.rectangle(img, (YOLOv3_pxl_l_t_x_name, YOLOv3_pxl_l_t_y_name),
             #                     (YOLOv3_pxl_r_b_x_name, YOLOv3_pxl_r_b_y_name),
@@ -700,10 +697,10 @@ for i in range(len(img_list_path_absolute)):
             # use a truetype font
             font_pil = ImageFont.truetype("arial.ttf", int(size_font_yolo_label_yellow * factor_size_labels))
             # Draw the text
-            draw.text((txt_pos_yl_yolov3_label_x,
-                       txt_pos_yl_yolov3_label_y - factor_size_labels * size_font_yolo_label_yellow),
-                      class_name_yellow_VDA, fill=(R_value_YOLOv3_label, G_value_YOLOv3_label, B_value_YOLOv3_label),
-                      font=font_pil)
+            # draw.text((txt_pos_yl_yolov3_label_x,
+            #            txt_pos_yl_yolov3_label_y - factor_size_labels * size_font_yolo_label_yellow),
+            #           class_name_yellow_VDA, fill=(R_value_YOLOv3_label, G_value_YOLOv3_label, B_value_YOLOv3_label),
+            #           font=font_pil)
 
             # Get back the image to OpenCV
             img = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
@@ -736,16 +733,16 @@ for i in range(len(img_list_path_absolute)):
             if white_depend_on_yellow_label is True:
                 wht_pxl_l_t_x = auto_calc_start_xl_lft_tp_x_white + wht_dstnc_l_t_x  # pixel left top white box
                 wht_pxl_l_t_y = auto_calc_start_xl_lft_tp_y_white + wht_dstnc_l_t_y
-                wht_pxl_r_b_x = wht_pxl_l_t_x + wht_label_width
-                wht_pxl_r_b_y = wht_pxl_l_t_y + wht_label_height
+                wht_pxl_r_b_x = wht_pxl_l_t_x + wht_label_width_scaled
+                wht_pxl_r_b_y = wht_pxl_l_t_y + wht_label_height_scaled
                 wht_col_R = 255
                 wht_col_G = 255
                 wht_col_B = 255
             else:
                 wht_pxl_l_t_x = auto_calc_start_xl_lft_tp_x_white  # + wht_dstnc_l_t_x  # pixel left top white box
                 wht_pxl_l_t_y = auto_calc_start_xl_lft_tp_y_white  # + wht_dstnc_l_t_y
-                wht_pxl_r_b_x = wht_pxl_l_t_x + wht_label_width
-                wht_pxl_r_b_y = wht_pxl_l_t_y + wht_label_height
+                wht_pxl_r_b_x = wht_pxl_l_t_x + wht_label_width_scaled
+                wht_pxl_r_b_y = wht_pxl_l_t_y + wht_label_height_scaled
                 wht_col_R = 255
                 wht_col_G = 255
                 wht_col_B = 255
@@ -856,8 +853,8 @@ for i in range(len(img_list_path_absolute)):
             ## YOLOv3 Label for white label box depends on size of white box
             YOLO_wht_pxl_l_t_x = wht_pxl_l_t_x - linestrength_YOLO_label
             YOLO_wht_pxl_l_t_y = wht_pxl_l_t_y - linestrength_YOLO_label
-            YOLO_wht_pxl_r_b_x = YOLO_wht_pxl_l_t_x + wht_label_width + linestrength_YOLO_label
-            YOLO_wht_pxl_r_b_y = YOLO_wht_pxl_l_t_y + wht_label_height + linestrength_YOLO_label
+            YOLO_wht_pxl_r_b_x = YOLO_wht_pxl_l_t_x + wht_label_width_scaled + linestrength_YOLO_label
+            YOLO_wht_pxl_r_b_y = YOLO_wht_pxl_l_t_y + wht_label_height_scaled + linestrength_YOLO_label
             # naming box
             YOLOv3_wht_pxl_l_t_x_name = YOLO_wht_pxl_l_t_x
             YOLOv3_wht_pxl_l_t_y_name = YOLO_wht_pxl_l_t_y - heigth_naming_YOLO_label
@@ -873,13 +870,13 @@ for i in range(len(img_list_path_absolute)):
             txt_pos_wht_yolov3_label_x = YOLO_wht_pxl_l_t_x + txt_yolo_wht_dstnc_x
             txt_pos_wht_yolov3_label_y = YOLO_wht_pxl_l_t_y - txt_yolo_wht_dstnc_y
 
-            """ 7. draw YOLO bounding boxes"""
+            """ 7.  YOLO bounding boxes"""
             # YOLOv bounding box white Label
-            img = cv2.rectangle(img, (YOLO_wht_pxl_l_t_x, YOLO_wht_pxl_l_t_y),
-                                (YOLO_wht_pxl_r_b_x, YOLO_wht_pxl_r_b_y),
-                                (B_value_YOLOv3_wht_label, G_value_YOLOv3_wht_label, R_value_YOLOv3_wht_label),
-
-                                thickness=linestrength_YOLO_label)
+            # img = cv2.rectangle(img, (YOLO_wht_pxl_l_t_x, YOLO_wht_pxl_l_t_y),
+            #                     (YOLO_wht_pxl_r_b_x, YOLO_wht_pxl_r_b_y),
+            #                     (B_value_YOLOv3_wht_label, G_value_YOLOv3_wht_label, R_value_YOLOv3_wht_label),
+            #
+            #                     thickness=linestrength_YOLO_label)
             # # naming box
             # img = cv2.rectangle(img, (YOLOv3_wht_pxl_l_t_x_name, YOLOv3_wht_pxl_l_t_y_name),
             #                     (YOLOv3_wht_pxl_r_b_x_name, YOLOv3_wht_pxl_r_b_y_name),
@@ -900,11 +897,11 @@ for i in range(len(img_list_path_absolute)):
             # use a truetype font and size
             font_pil = ImageFont.truetype("arial.ttf", int(size_font_yolo_label_white * factor_size_labels))
             # Draw the text
-            draw.text((txt_pos_wht_yolov3_label_x,
-                       txt_pos_wht_yolov3_label_y - factor_size_labels * size_font_yolo_label_white),
-                      class_name_white_VDA_4994,
-                      fill=(R_value_YOLOv3_wht_label, G_value_YOLOv3_wht_label, B_value_YOLOv3_wht_label),
-                      font=font_pil)
+            # draw.text((txt_pos_wht_yolov3_label_x,
+            #            txt_pos_wht_yolov3_label_y - factor_size_labels * size_font_yolo_label_white),
+            #           class_name_white_VDA_4994,
+            #           fill=(R_value_YOLOv3_wht_label, G_value_YOLOv3_wht_label, B_value_YOLOv3_wht_label),
+            #           font=font_pil)
             # Get back the image to OpenCV format
             img = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
 
@@ -953,8 +950,8 @@ for i in range(len(img_list_path_absolute)):
             """normalizing pixel values white label"""
             normalized_YOLOv3_white_pxl_l_t_x = max(0,float(YOLO_wht_pxl_l_t_x / img.shape[1]))
             normalized_YOLOv3_white_pxl_l_t_y = max(0, float(YOLO_wht_pxl_l_t_y / img.shape[0]))
-            normalized_width_white_YOLO_label = max(0,float((wht_label_width + linestrength_YOLO_label) / img.shape[1]))
-            normalized_heigth_white_YOLO_label = float((wht_label_height + linestrength_YOLO_label) / img.shape[0])
+            normalized_width_white_YOLO_label = max(0, float((wht_label_width_scaled + linestrength_YOLO_label) / img.shape[1]))
+            normalized_heigth_white_YOLO_label = float((wht_label_height_scaled + linestrength_YOLO_label) / img.shape[0])
 
             YOLO_label_string_white = str(class_names.index("white_VDA_4994_label")) + " " + \
                                       str(normalized_YOLOv3_white_pxl_l_t_x) + " " + \
@@ -1397,16 +1394,16 @@ class number 0 for YOLO labelling"""
 # if white_depend_on_yellow_label is True:
 #     wht_pxl_l_t_x = auto_calc_start_xl_lft_tp_x + wht_dstnc_l_t_x  # pixel left top white box
 #     wht_pxl_l_t_y = auto_calc_start_xl_lft_tp_y + wht_dstnc_l_t_y
-#     wht_pxl_r_b_x = wht_pxl_l_t_x + wht_label_width
-#     wht_pxl_r_b_y = wht_pxl_l_t_y + wht_label_height
+#     wht_pxl_r_b_x = wht_pxl_l_t_x + wht_label_width_scaled
+#     wht_pxl_r_b_y = wht_pxl_l_t_y + wht_label_height_scaled
 #     wht_col_R = 255
 #     wht_col_G = 255
 #     wht_col_B = 255
 # else:
 #     wht_pxl_l_t_x = auto_calc_start_xl_lft_tp_x_white  # + wht_dstnc_l_t_x  # pixel left top white box
 #     wht_pxl_l_t_y = auto_calc_start_xl_lft_tp_y_white  # + wht_dstnc_l_t_y
-#     wht_pxl_r_b_x = wht_pxl_l_t_x + wht_label_width
-#     wht_pxl_r_b_y = wht_pxl_l_t_y + wht_label_height
+#     wht_pxl_r_b_x = wht_pxl_l_t_x + wht_label_width_scaled
+#     wht_pxl_r_b_y = wht_pxl_l_t_y + wht_label_height_scaled
 #     wht_col_R = 255
 #     wht_col_G = 255
 #     wht_col_B = 255
@@ -1414,8 +1411,8 @@ class number 0 for YOLO labelling"""
 # ## YOLOv3 Label for white label box depends on size of white box
 # YOLO_wht_pxl_l_t_x = wht_pxl_l_t_x - linestrength_YOLO_label
 # YOLO_wht_pxl_l_t_y = wht_pxl_l_t_y - linestrength_YOLO_label
-# YOLO_wht_pxl_r_b_x = YOLO_wht_pxl_l_t_x + wht_label_width + linestrength_YOLO_label
-# YOLO_wht_pxl_r_b_y = YOLO_wht_pxl_l_t_y + wht_label_height + linestrength_YOLO_label
+# YOLO_wht_pxl_r_b_x = YOLO_wht_pxl_l_t_x + wht_label_width_scaled + linestrength_YOLO_label
+# YOLO_wht_pxl_r_b_y = YOLO_wht_pxl_l_t_y + wht_label_height_scaled + linestrength_YOLO_label
 # # naming box
 # YOLOv3_wht_pxl_l_t_x_name = YOLO_wht_pxl_l_t_x
 # YOLOv3_wht_pxl_l_t_y_name = YOLO_wht_pxl_l_t_y - heigth_naming_YOLO_label
