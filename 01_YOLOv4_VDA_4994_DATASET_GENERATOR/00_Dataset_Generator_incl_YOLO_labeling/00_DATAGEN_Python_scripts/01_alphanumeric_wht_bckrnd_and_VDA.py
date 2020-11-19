@@ -66,7 +66,7 @@ complete_dataset = [[]]
 complete_datset_np = np.array([], [])
 
 font = cv2.FONT_HERSHEY_SIMPLEX  # OpenCV font
-number_of_images_per_basic_image = 15   # how many images are printed for each backround image
+number_of_images_per_basic_image = 10   # how many images are printed for each backround image
 white_depend_on_yellow_label = False  # if white and yellow label are always in the same difference to each other
 
 labels_random_size_ratio_min = 0.2  # min 0.1
@@ -541,7 +541,7 @@ for i in range(len(img_list_path_absolute)):
                     f.write(YOLO_label_string_alphanum)
                     f.write("\n")
 
-            complete_dataset.append([filename_str, filename_txt])
+            #complete_dataset.append([filename_str, filename_txt])
             complete_dataset_np = np.append(filename_str, filename_txt)
 
             # count += 1
@@ -1005,6 +1005,8 @@ with open(dataset_path + '\obj.data', 'w') as f:
 ###############################################################################
 
 
+
+
 """"DATASET SPLIT (5 different Training-Test sets for cross-validation)"""
 print("Complete dataset is:{}".format(complete_dataset))
 print("Complete dataset is:{}".format(complete_dataset_np))
@@ -1015,33 +1017,59 @@ total_number_images = len(complete_dataset)
 print("Total number of images in dataset: {}".format(total_number_images))
 random.shuffle(complete_dataset)
 print("Shuffled dataset: {}".format(complete_dataset))
-number_splitted_data = int(total_number_images / (number_datasets - 1))
-print(number_splitted_data)
 
+"""CHUNK dataset"""
+size_dataset_chunks = int(total_number_images / (number_datasets - 1))
+print(size_dataset_chunks)
 
 def divide_chunks(list_data, size_chunk_data):
     # loop till length list
     for number in range(0, len(list_data), size_chunk_data):
-        yield complete_dataset[number:number + number_splitted_data]
+        yield complete_dataset[number: number + size_dataset_chunks]
 
-
-chunked_list_complete_dataset = list(divide_chunks(complete_dataset, number_splitted_data))
-chunked_list_complete_dataset_copy = list(divide_chunks(complete_dataset, number_splitted_data))
+chunked_list_complete_dataset = list(divide_chunks(complete_dataset, size_dataset_chunks))
+chunked_list_complete_dataset_copy = list(divide_chunks(complete_dataset, size_dataset_chunks))
 print(chunked_list_complete_dataset)
 print(len(chunked_list_complete_dataset))
+
+dataset_chunksplitted = []
+for number_vals in range(0, len(complete_dataset), size_dataset_chunks):
+    dataset_chunksplitted.append(complete_dataset[number_vals : number_vals + size_dataset_chunks])
+
+    #number_vals = number_vals + size_dataset_chunks
+    #counter_splitted_data = counter_splitted_data + 1
+    #size_dataset_chunks = size_dataset_chunks * counter_splitted_data
+
+####################################
+#
+# pandas_dataset = pd.Data
+# # FIXME: See update below
+# def index_marks(nrows, chunk_size):
+#     return range(1 * chunk_size, (nrows // chunk_size + 1) * chunk_size, chunk_size)
+#
+# indices = list(chunk_marks(complete_dataset.shape[0], 100))
+# print("Marks: {}".format(indices))
+#
+# # Output:
+# #   Marks: [100, 200, 300, 400, 500]
+# def split(dfm, chunk_size):
+#     indices = index_marks(dfm.shape[0], chunk_size)
+#     return np.split(dfm, indices)
+#
+# chunks = split(dfm, 100)
+# for c in chunks:
+#     print("Shape: {}; {}".format(c.shape, c.index))
+
+
+#
+
 
 training_dataset_prt_1 = {}
 training_dataset_prt_2 = {}
 test_dataset = {}
 training_dataset = {}
 
-# for k in range(len(chunked_list_complete_dataset)):
-#     #test_set = chunked_list_complete_dataset.pop([k])
-#     test_dataset[k] = chunked_list_complete_dataset[k]
-
-# for nmbr_of_chunk in chunked_list_complete_dataset:
-
-for f in range(len(chunked_list_complete_dataset)):
+for f in range(0,len(chunked_list_complete_dataset)):
     print(len(chunked_list_complete_dataset))
     ## first testdatayet is last chunk and with every loop moves back to the first chunk
     if f == 0:
@@ -1052,6 +1080,7 @@ for f in range(len(chunked_list_complete_dataset)):
         dataset_train = chunked_list_complete_dataset[
                         :len(chunked_list_complete_dataset) - 1 - f] + chunked_list_complete_dataset[
                                                                        len(chunked_list_complete_dataset) - 1 - f + 1:]
+    ### SAVE in DICTIONARIES
     test_dataset[f] = dataset_test
     training_dataset[f] = dataset_train
 
@@ -1096,8 +1125,8 @@ for key, value in training_dataset.items():
     newPath = shutil.copy2(source_path_obj_data, target_path_config_files)
     newPath = shutil.copy2(source_path_obj_names, target_path_config_files)
 
-    for value_list in value:
 
+    for value_list in value:
         # 2nd: Save Chunks of Training and Test Set
         file_list_to_copy = value_list
 
@@ -1152,6 +1181,8 @@ for key, value in test_dataset.items():
     root_dir_test_zip = os.getcwd() + r'\yolov{}\Dataset_{}'.format(yolo_version, key)
     base_dir_test_zip = 'test'
     shutil.make_archive(path_test_zip, 'zip', root_dir_test_zip, base_dir_test_zip)
+
+
 ## create backup folder inside yolov4 folder
 
 
