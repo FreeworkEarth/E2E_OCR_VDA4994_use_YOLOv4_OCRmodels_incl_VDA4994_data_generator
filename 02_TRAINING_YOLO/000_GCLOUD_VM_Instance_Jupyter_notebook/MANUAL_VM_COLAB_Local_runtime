@@ -1,0 +1,12 @@
+COLAB BACKEND NOTEBOOK COMMANDS
+ 1: VM instance with TeslaV100
+ 2: Metadata: 
+	enable-oslogin = TRUE
+ 3: http + https traffic on
+ 4: COMMANDS IN GCLOUD SHELL or GCLOUD SDK
+	
+
+	
+pip install jupyter_http_over_ws
+jupyter serverextension enable --py jupyter_http_over_ws 
+jupyter notebook --NotebookApp.allow_origin='https://colab.research.google.com' --port=8081 --NotebookApp.port_retries=0 --no-browser

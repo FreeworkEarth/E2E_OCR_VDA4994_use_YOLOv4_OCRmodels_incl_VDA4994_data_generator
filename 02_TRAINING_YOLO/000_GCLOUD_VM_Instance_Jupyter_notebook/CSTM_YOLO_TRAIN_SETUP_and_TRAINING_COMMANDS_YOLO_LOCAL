@@ -1,0 +1,20 @@
+"""CUSTOM YOLO(v4( TRAINING COMMANDS"""
+
+### WINDOWS
+# 1. Deploy OpenCV, CUDA, CudNN and Darknet (YOLO9 on WINDOWS - best Tut:
+## https://medium.com/analytics-vidhya/installing-darknet-on-windows-462d84840e5a
+
+
+# 2. Copy your custom dataset intp darknet folder
+## a)(obj.zip, test.zip) and unzip, train.txt, test.txt, obj.names, obj.data and classed.txt into darknet/data folder
+## b) custom config file (.cfg) into darknet/cfg folder
+
+# 3. Download pretraineid weights for your model (usually trained on COCO - dataset - yolov4.conv.137)
+# 4. Open Powershell in admin mode and go to path of darknet (where you deployed darknet with OpenCV
+# 5. Training commands YOLO
+
+##a) Start Training at 0 (trained on COCO)
+###.\darknet.exe detector train data\obj.data cfg\yolov4-cstm.cfg  yolov4.conv.137 -dont_show -map
+
+## b)  Start Training at last weights
+###.\darknet.exe detector train data\obj.data cfg\yolov4-cstm.cfg C:\Users\chari\Desktop\YOLOv4_Training\darknet-master\backup\yolov4-cstm_last.weights -dont_show -map
