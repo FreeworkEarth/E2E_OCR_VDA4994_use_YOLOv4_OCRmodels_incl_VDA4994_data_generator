@@ -1,12 +1,115 @@
 COLAB BACKEND NOTEBOOK COMMANDS
+# SETUP VM INstance in GCLOUD for jupyter notebook 
+https://research.google.com/colaboratory/local-runtimes.html
+https://towardsdatascience.com/running-jupyter-notebook-in-google-cloud-platform-in-15-min-61e16da34d52
  1: VM instance with TeslaV100
  2: Metadata: 
 	enable-oslogin = TRUE
  3: http + https traffic on
  4: COMMANDS IN GCLOUD SHELL or GCLOUD SDK
-	
+ 
+## INSTALL PACKAGES AND ENABLE SERVER 
+#Depends in VM name and project ID
 
-	
-pip install jupyter_http_over_ws
-jupyter serverextension enable --py jupyter_http_over_ws 
-jupyter notebook --NotebookApp.allow_origin='https://colab.research.google.com' --port=8081 --NotebookApp.port_retries=0 --no-browser
+https://stackoverflow.com/questions/61900698/connect-google-colab-to-a-runtime-on-a-google-compute-engine-instance
+
+a) 
+gcloud  compute ssh yolov4-teslav100-colabbackend --project cloud-vm-intrafly-vda --zone europe-west4-a  -- -L 8081:localhost:8081
+
+
+
+
+b)
+gcloud beta compute firewall-rules create "default-allow-jupyter" --network "default" --allow tcp:8888 --direction "ingress" --priority 65534 --source-ranges 0.0.0.0/0 --target-tags "jupyter" --project cloud-vm-intrafly-vda
+
+
+
+
+c) instructions of COLAB
+
+pip install --upgrade jupyter_http_over_ws>=0.0.7 && jupyter serverextension enable --py jupyter_http_over_ws
+pip install jupyter_http_over_ws  && jupyter serverextension enable --py jupyter_http_over_ws 
+
+d) 
+jupyter notebook --NotebookApp.allow_origin='https://colab.research.google.com' --port=8080 --NotebookApp.port_retries=0 --no-browser
+
+
+
+
+
+
+
+
+
+
+
+
+manual from https://jeffdelaney.me/blog/running-jupyter-notebook-google-cloud-platform/
+
+
+1) gcloud compute --project "<your project="">" ssh --zone "<your zone="">" "yourinstance"
+
+gcloud compute --project cloud-vm-intrafly-vda ssh --zone us-west1-b yolov4-training-test1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Generating public/private rsa key pair.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/christoph_haring_mail_de/.ssh/google_compute_engine.
+Your public key has been saved in /home/christoph_haring_mail_de/.ssh/google_compute_engine.pub.
+The key fingerprint is:
+SHA256:uXVnLbDP67k2fGxWn5JDygcYrb+1iz1VLo+Ua2pnM78 christoph_haring_mail_de@yolov4-training-test1
+The key's randomart image is:
++---[RSA 2048]----+
+|                 |
+|                 |
+|          . .    |
+|         o . o ..|
+|        S = o +oo|
+|         = o *+oo|
+|        . o ++=*+|
+|           +=*&+B|
+|           ++@XEo|
++----[SHA256]-----+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(SSH key: Your identification has been saved in /home/christoph_haring_mail_de/.ssh/google_compute_engine.
+Your public key has been saved in /home/christoph_haring_mail_de/.ssh/google_compute_engine.pub.
+The key fingerprint is:
+SHA256:xzQY9nx/Ql/IDraPknj0yeIeNEwCHPfanXdbrsWdsys christoph_haring_mail_de@yolov4-teslav100-colabbackend
+The key's randomart image is:
++---[RSA 2048]----+
+|     .o.+        |
+|      .+ *   . . |
+|        o B + + .|
+|         O = B ..|
+|        S O + = =|
+|         = = = *=|
+|        . * = .+=|
+|         o + E oo|
+|         .o   oo.|
++----[SHA256]-----+
