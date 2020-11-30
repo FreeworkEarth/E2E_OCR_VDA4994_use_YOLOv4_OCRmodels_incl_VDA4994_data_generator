@@ -366,8 +366,8 @@ for i in range(len(img_list_path_absolute)):
                 print(value_random_alphanumerical)
 
                 ### starting left top alphanumeric
-                auto_calc_start_alphanumeric_left_top_x = int(float(random.uniform(0, img.shape[1])))
-                auto_calc_start_alphanumeric_left_top_y = int(float(random.uniform(0, img.shape[0])))
+                auto_calc_start_alphanumeric_left_top_x =  int(float(random.uniform(0.00001, img.shape[1])))
+                auto_calc_start_alphanumeric_left_top_y =  int(float(random.uniform(0.00001, img.shape[0])))
 
                 #### print random letter in image
                 """ Draw radnom alphanumerics in image """
@@ -403,8 +403,8 @@ for i in range(len(img_list_path_absolute)):
                 G_val_alphanum = 36
                 R_val_alphanum = 100
 
-                boundbox_alphanum_top_x = max(0,int(auto_calc_start_alphanumeric_left_top_x))
-                boundbox_alphanum_top_y = max(0,int(auto_calc_start_alphanumeric_left_top_y - factor_size_alphanumerics * (font_size_alphanumerics)))
+                boundbox_alphanum_top_x = max(0.000001,int(auto_calc_start_alphanumeric_left_top_x))
+                boundbox_alphanum_top_y = max(0.000001,int(auto_calc_start_alphanumeric_left_top_y - factor_size_alphanumerics * (font_size_alphanumerics)))
                 boundbox_alphanum_bottom_x = min(int(auto_calc_start_alphanumeric_left_top_x + factor_size_alphanumerics * (font_size_alphanumerics - 20)),width_img)
                 boundbox_alphanum_bottom_y = min(int(auto_calc_start_alphanumeric_left_top_y),image_height)
 
@@ -585,8 +585,9 @@ for i in range(len(img_list_path_absolute)):
             #  yellow label
             yellow_label_text_complete = []
 
-
+            
             label_1st_pos = random_text_gen(2, randomascii=False, uppercase=True)
+
             label_2nd_pos = random_text_gen(1, randomascii=False, uppercase=False, lowercase=False)
             label_3rd_pos = '-'
             label_4th_pos = random_text_gen(3, randomascii=False, uppercase=False, lowercase=False)
@@ -945,9 +946,9 @@ for i in range(len(img_list_path_absolute)):
             # class # pixel top left corne  r x bounding box # pixel top left corner y bounding box # width of box # height box
 
             """10 . normalizing pixel values yellow label"""
-            normalized_YOLOv3_pxl_l_t_x = max(0,float(YOLOv3_pxl_l_t_x / img.shape[1]))
-            normalized_YOLOv3_pxl_l_t_y = max(0,float(YOLOv3_pxl_l_t_y / img.shape[0]))
-            normalized_width_YOLO_label = max(0,float((yl_label_width + linestrength_YOLO_label) / img.shape[1]))
+            normalized_YOLOv3_pxl_l_t_x = max(0.000001,float(YOLOv3_pxl_l_t_x / img.shape[1]))
+            normalized_YOLOv3_pxl_l_t_y = max(0.000001,float(YOLOv3_pxl_l_t_y / img.shape[0]))
+            normalized_width_YOLO_label = max(0.000001,float((yl_label_width + linestrength_YOLO_label) / img.shape[1]))
             normalized_heigth_YOLO_label = float((yl_label_height + linestrength_YOLO_label) / img.shape[0])
             YOLO_label_string_yellow = str(class_names.index("yellow_VDA_label")) + " " + \
                                        str(normalized_YOLOv3_pxl_l_t_x) + " " + \
@@ -956,10 +957,10 @@ for i in range(len(img_list_path_absolute)):
                                        str(normalized_heigth_YOLO_label)
 
             """normalizing pixel values white label"""
-            normalized_YOLOv3_white_pxl_l_t_x = max(0,float(YOLO_wht_pxl_l_t_x / img.shape[1]))
-            normalized_YOLOv3_white_pxl_l_t_y = max(0, float(YOLO_wht_pxl_l_t_y / img.shape[0]))
-            normalized_width_white_YOLO_label = max(0,float((wht_label_width + linestrength_YOLO_label) / img.shape[1]))
-            normalized_heigth_white_YOLO_label = float((wht_label_height + linestrength_YOLO_label) / img.shape[0])
+            normalized_YOLOv3_white_pxl_l_t_x = max(0.00001,float(YOLO_wht_pxl_l_t_x / img.shape[1]))
+            normalized_YOLOv3_white_pxl_l_t_y = max(0.00001, float(YOLO_wht_pxl_l_t_y / img.shape[0]))
+            normalized_width_white_YOLO_label = max(0.00001, float((wht_label_width_scaled + linestrength_YOLO_label) / img.shape[1]))
+            normalized_heigth_white_YOLO_label = float((wht_label_height_scaled + linestrength_YOLO_label) / img.shape[0])
 
             YOLO_label_string_white = str(class_names.index("white_VDA_4994_label")) + " " + \
                                       str(normalized_YOLOv3_white_pxl_l_t_x) + " " + \
@@ -1144,7 +1145,7 @@ for key, value in training_dataset.items():
                 target_path = PurePath(dataset_path_training_new)  # r"\{}".format(single_file_to_copy))
                 newPath = shutil.copy2(original_path, target_path)
 
-    ## zip obj folder for training in cloud
+    # zip obj folder for training in cloud
     path_train_zip = os.getcwd() + r'\yolov{}\Dataset_{}\obj'.format(yolo_version, key)
     root_dir_train_zip = os.getcwd() + r'\yolov{}\Dataset_{}'.format(yolo_version, key)
     base_dir_train_zip = 'obj'
