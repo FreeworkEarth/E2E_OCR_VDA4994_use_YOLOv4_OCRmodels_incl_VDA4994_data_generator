@@ -628,6 +628,9 @@ for i in range(len(img_list_path_absolute)):
             # Get back the image to OpenCV
             img = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
 
+
+
+
             ### black number
             ## OpenCv
             # cv2.putText(img, random_text_gen(2, randomascii=False, uppercase=False, lowercase=False),
