@@ -2,7 +2,7 @@ import random
 import string
 from functools import*
 
-""" text generator"""
+""" random text/alphanumeric in ascii generator"""
 
 def random_text_gen(length=32, randomascii=True, uppercase=True, lowercase=True, numbers=True):
     character_set = ''  # lowercase, uppercase, digits etc. possible

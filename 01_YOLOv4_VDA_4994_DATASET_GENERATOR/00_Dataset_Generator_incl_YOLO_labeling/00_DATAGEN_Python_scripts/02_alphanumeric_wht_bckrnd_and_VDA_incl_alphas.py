@@ -92,7 +92,7 @@ alphanumeric_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
                      "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
                      "U", "V", "W", "X", "Y", "Z",
                      "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
-                     "u", "v", "w", "x", "y", "z"]
+                     "u", "v", "w", "x", "y", "z", "-"]
 print(len(alphanumeric_list))
 
 string_alphanumeric = string_alphanumeric_numbers + string_alphanumeric_uppercase + string_alphanumeric_lowercase
@@ -188,6 +188,60 @@ print(str(img_list_path_absolute[0]))
 # for file in arr:
 #     img_list_2.append(file)
 # print(img_list_2)
+
+
+""" FUNCTIONS (HELPER)"""
+
+##### draw bbox and text into image with PIL.ImageDraw, receive yolo normalized bbox coordinates for each drawn character
+
+def draw_pillow_text_with_bounding_box_coordinates(xy_coordinates_left_top, text, font,
+                                                   fill_colour):  # ((int,int), str, font object, str)
+    ##
+    # xy = (auto_calc_start_alphanumeric_left_top_x, auto_calc_start_alphanumeric_left_top_y - factor_size_alphanumerics * font_size_alphanumerics)
+
+    draw.text(xy_coordinates_left_top, text, fill=fill_colour, font=font, align="left")
+
+    # normalized YOLO / object detector labels
+    norm_yolo_x_l_t_list = []
+    norm_yolo_y_l_t_list = []
+    norm_yolo_width_list = []
+    norm_yolo_heigth_list = []
+    string_yolo_labelling_bbox_list = []
+
+    for i, char in enumerate(text):
+        bottom_1 = font.getsize(text[i])[1]
+        right, bottom_2 = font.getsize(text[:i + 1])
+        bottom = bottom_1 if bottom_1 < bottom_2 else bottom_2
+        width, height = font.getmask(char).size
+        right += xy_coordinates_left_top[0]
+        bottom += xy_coordinates_left_top[1]
+        top = bottom - height
+        left = right - width
+
+        norm_yolo_x_l_t = (right / image_width)
+        norm_yolo_x_l_t_list.append(norm_yolo_x_l_t)
+
+        norm_yolo_y_l_t = (top / image_height)
+        norm_yolo_y_l_t_list.append(norm_yolo_y_l_t)
+
+        norm_yolo_width = (width / image_width)
+        norm_yolo_width_list.append(norm_yolo_width)
+
+        norm_yolo_heigth = (height / image_height)
+        norm_yolo_heigth_list.append(norm_yolo_heigth)
+
+        string_textfile_yolo_labelling_bbox = r"{} {} {} {} ".format(norm_yolo_x_l_t, norm_yolo_y_l_t, norm_yolo_width,
+                                                                     norm_yolo_heigth)
+        string_yolo_labelling_bbox_list.append(string_textfile_yolo_labelling_bbox)
+
+        draw.rectangle((left, top, right, bottom), None, "#f00")
+        draw.rectangle((left, top, right, bottom), None, "#f00")
+
+        # string_bounding_box_yolo =
+        return (
+        left, top, right, bottom, width, height, string_yolo_labelling_bbox_list, string_textfile_yolo_labelling_bbox,
+        norm_yolo_x_l_t_list, norm_yolo_y_l_t_list, norm_yolo_width_list, norm_yolo_heigth_list)
+
 
 
 """ LOOP to Create VDA 4994 labels and ALPHANUMERIC signs inside random base image"""
@@ -355,6 +409,8 @@ for i in range(len(img_list_path_absolute)):
             boundbox_alphanum_bottom_x_list = []
             boundbox_alphanum_bottom_y_list = []
 
+
+
             value_random_alphanumerical_list = []
             for nmbr_alphanum in range(number_printed_alphanumerical):
 
@@ -380,21 +436,70 @@ for i in range(len(img_list_path_absolute)):
                 # Pass the image to PIL
                 pil_im = Image.fromarray(cv2_im_rgb)
                 draw = ImageDraw.Draw(pil_im)
+
+
                 font_size_alphanumerics = 200
                 # use a truetype font
                 factor_size_alphanumerics = random.uniform(alphanumeric_random_size_ratio_min,
                                                            alphanumeric_random_size_ratio_max)
 
                 font_pil = ImageFont.truetype("arial.ttf", int(font_size_alphanumerics * factor_size_alphanumerics))
-
                 # Draw the text
-                draw.text((auto_calc_start_alphanumeric_left_top_x,
-                           auto_calc_start_alphanumeric_left_top_y - factor_size_alphanumerics * font_size_alphanumerics),
-                          value_random_alphanumerical, fill="black", font=font_pil, align="left")
+
+                # def draw_pillow_text_with_bounding_box_coordinates(xy_coordinates_left_top, text,  font , fill_colour):  #((int,int), str, font object, str)
+                #     ##
+                #     #xy = (auto_calc_start_alphanumeric_left_top_x, auto_calc_start_alphanumeric_left_top_y - factor_size_alphanumerics * font_size_alphanumerics)
+                #
+                #     draw.text(xy_coordinates_left_top, text, fill= fill_colour, font=font, align="left")
+                #
+                #     # normalized YOLO / object detector labels
+                #     norm_yolo_x_l_t_list  = []
+                #     norm_yolo_y_l_t_list  = []
+                #     norm_yolo_width_list  = []
+                #     norm_yolo_heigth_list = []
+                #     string_yolo_labelling_bbox_list = []
+                #
+                #     for i, char in enumerate(text):
+                #         bottom_1 = font.getsize(text[i])[1]
+                #         right, bottom_2 = font.getsize(text[:i + 1])
+                #         bottom = bottom_1 if bottom_1 < bottom_2 else bottom_2
+                #         width, height = font.getmask(char).size
+                #         right += xy_coordinates_left_top[0]
+                #         bottom += xy_coordinates_left_top[1]
+                #         top = bottom - height
+                #         left = right - width
+                #
+                #         norm_yolo_x_l_t = (right / image_width)
+                #         norm_yolo_x_l_t_list.append(norm_yolo_x_l_t)
+                #
+                #         norm_yolo_y_l_t = (top / image_height)
+                #         norm_yolo_y_l_t_list.append(norm_yolo_y_l_t)
+                #
+                #         norm_yolo_width = (width / image_width)
+                #         norm_yolo_width_list.append(norm_yolo_width)
+                #
+                #         norm_yolo_heigth = (height / image_height)
+                #         norm_yolo_heigth_list.append(norm_yolo_heigth)
+                #
+                #         string_textfile_yolo_labelling_bbox = r"{} {} {} {} ".format(norm_yolo_x_l_t, norm_yolo_y_l_t, norm_yolo_width, norm_yolo_heigth)
+                #         string_yolo_labelling_bbox_list.append(string_textfile_yolo_labelling_bbox)
+                #
+                #         draw.rectangle((left, top, right, bottom), None, "#f00")
+                #         draw.rectangle((left, top, right, bottom), None, "#f00")
+                #
+                #         #string_bounding_box_yolo =
+                #         return(left, top,right, bottom, width, height, string_yolo_labelling_bbox_list,string_textfile_yolo_labelling_bbox, norm_yolo_x_l_t_list, norm_yolo_y_l_t_list, norm_yolo_width_list, norm_yolo_heigth_list)
+
+                drawn_alpha = draw_pillow_text_with_bounding_box_coordinates((auto_calc_start_alphanumeric_left_top_x, (auto_calc_start_alphanumeric_left_top_y - factor_size_alphanumerics * font_size_alphanumerics)), value_random_alphanumerical, font_pil, "black")
+
+                #string_yolo = []
+                #string_yolo.append(string_textfile_yolo_labelling_bbox)
+
                 # Get back the image to OpenCV
                 img = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)  # Even
 
                 string_filename_alphanum_complete[nmbr_alphanum] = value_random_alphanumerical
+
 
                 """  YOLO bounding boxes"""
                 # YOLOv bounding box alphanum
@@ -552,7 +657,6 @@ for i in range(len(img_list_path_absolute)):
             """CLASS 0     Yellow label  dependend on random image pixels in range of image pixels class number 0 for YOLO labelling
                     """
 
-
             def draw_yellow_VDA_label():
                 pass
 
@@ -582,19 +686,48 @@ for i in range(len(img_list_path_absolute)):
 
             """ 3. define text for yellow label """
             # """ random label text generator"""
-            #  yellow label
-            yellow_label_text_complete = []
 
-            
-            label_1st_pos = random_text_gen(2, randomascii=False, uppercase=True)
+            #  yellow label text function
+            def text_label_0(i,j,k,l):
 
-            label_2nd_pos = random_text_gen(1, randomascii=False, uppercase=False, lowercase=False)
-            label_3rd_pos = '-'
-            label_4th_pos = random_text_gen(3, randomascii=False, uppercase=False, lowercase=False)
-            label_5th_pos = random_text_gen(1, randomascii=False, uppercase=True)
-            label_yellow_text_combined = '%s%s %s %s%s' % (
-                label_1st_pos, label_2nd_pos, label_3rd_pos, label_4th_pos, label_5th_pos)
+                text_complete = []
 
+                for first_part in range(i):
+                    label_1st_pos = random_text_gen(1, randomascii=False, uppercase=True)
+                    text_complete.append(label_1st_pos)
+
+                for second_part in range(j):
+                    label_2nd_pos = random_text_gen(1, randomascii=False, uppercase=False, lowercase=False)
+                    text_complete.append(label_2nd_pos)
+
+                label_3rd_pos = r' - '
+                text_complete.append(label_3rd_pos)
+
+                for fourth_part in range(k):
+                    label_4th_pos = random_text_gen(1, randomascii=False, uppercase=False, lowercase=False)
+                    text_complete.append(label_4th_pos)
+
+                for fifth_part in range(l):
+                    label_5th_pos = random_text_gen(1, randomascii=False, uppercase=True)
+                    text_complete.append((label_5th_pos))
+
+                string_complete_0 = ""
+                for list_element in range(len(text_complete)):
+                    string_complete_0 = string_complete_0 + str(text_complete[list_element])
+
+                return string_complete_0
+
+
+            #label_yellow_text_combined = '%s%s %s %s%s' % (label_1st_pos, label_2nd_pos, label_3rd_pos, label_4th_pos, label_5th_pos)
+
+            string_yellow_complete = text_label_0(2,1,3,1)
+
+            #for list_element in range(len(yellow_label_text_complete)):
+             #   string_yellow_complete = string_yellow_complete + str(yellow_label_text_complete[list_element])
+
+            label_yellow_text_combined = string_yellow_complete
+
+            print(string_yellow_complete)
             print(label_yellow_text_combined)
 
             """ 4. define yellow Label Labels text positions"""
@@ -713,6 +846,16 @@ for i in range(len(img_list_path_absolute)):
             # Get back the image to OpenCV
             img = cv2.cvtColor(np.array(pil_im), cv2.COLOR_RGB2BGR)
 
+
+
+
+
+
+
+
+
+
+
             """ BUILIDNG BLOCK DRAW  white VDA LABEL including YOLO Bounding Boxes"""
             """ 1. define yellow label START pixels"""
             """ 2. draw yellow label / box (without YOLO)"""
@@ -811,6 +954,43 @@ for i in range(len(img_list_path_absolute)):
 
             """ 3. define text for white label """
             # white label
+            def article_code_VDA_4994(i,j,k,l):
+
+                text_complete = []
+
+                for first_part in range(i):
+                    label_1st_pos = random_text_gen(1, randomascii=False, uppercase=True)
+                    text_complete.append(label_1st_pos)
+
+                second_part = r'-'
+                text_complete.append(second_part)
+
+                for third_part in range(j):
+                    label_3rd_pos = random_text_gen(1, randomascii=False, uppercase=False, lowercase=False)
+                    text_complete.append(label_3rd_pos)
+
+                fourth_part = r' - '
+                text_complete.append(fourth_part)
+
+                for fifth_part in range(k):
+                    fifth_part = random_text_gen(1, randomascii=False, uppercase=False, lowercase=False)
+                    text_complete.append(fifth_part)
+
+                sixth_part = r' - '
+                text_complete.append(sixth_part)
+
+                for seventh_part in range(l):
+                    seventh_part = random_text_gen(1, randomascii=False, uppercase=True)
+                    text_complete.append((seventh_part))
+
+                string_complete = ""
+                for list_element in range(len(text_complete)):
+                    string_complete = string_complete + str(text_complete[list_element])
+
+                return string_complete
+
+
+
             label_1st_pos = random_text_gen(3, randomascii=False, uppercase=True)
             label_2nd_pos = '-'
             label_3rd_pos = random_text_gen(3, randomascii=False, uppercase=False, lowercase=False)
@@ -823,6 +1003,10 @@ for i in range(len(img_list_path_absolute)):
             # label_white_number = random_text_gen(10, randomascii=False, uppercase=False, lowercase=False)
             print(label_white_number)
             label_white_str = r'%s' % (label_white_number)
+
+            label_white_str = article_code_VDA_4994(3,3,3,3)
+
+
 
             """ 4. define Labels text positions"""
             # on white label
