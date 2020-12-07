@@ -95,6 +95,7 @@ def dataset_split_VDA_alphnumerics(dataset_path_VDA_4994, dataset_path_alphanume
 
 """ Backup Folder for trained weights file (deciding wether training in Google Colab or Other Machine"""
 GOOGLE_COLAB_TRAINING = 0
+
 if GOOGLE_COLAB_TRAINING == 1:
     backup_folder = pathlib.Path(r"/mydrive/yolov{}/backup".format(yolo_version))   # backup folder for weights file
 else:

@@ -1,0 +1,7 @@
+(tensorflow) C:\Users\chari\Google Drive\PR_ML_DL_AI_NAO\9_OBJECT detection\Tesseract\Tesseract PyImageSearch\tesseract-python>
+
+python ocr.py --image  C:\Users\chari\Desktop\YOLOv4_Training\darknet-master\000_test_detect\SOLO_VDA_4994\13.jpg
+
+
+
+

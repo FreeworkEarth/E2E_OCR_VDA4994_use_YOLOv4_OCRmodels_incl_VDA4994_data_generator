@@ -16,5 +16,42 @@
 ##a) Start Training at 0 (trained on COCO)
 ###.\darknet.exe detector train data\obj.data cfg\yolov4-cstm.cfg  yolov4.conv.137 -dont_show -map
 
+
+
+
 ## b)  Start Training at last weights
-###.\darknet.exe detector train data\obj.data cfg\yolov4-cstm.cfg C:\Users\chari\Desktop\YOLOv4_Training\darknet-master\backup\yolov4-cstm_last.weights -dont_show -map
+.\darknet.exe detector train data\obj.data cfg\yolov4-cstm.cfg C:\Users\chari\Desktop\YOLOv4_Training\darknet-master\backup\yolov4-cstm_last.weights -dont_show -map	
+
+
+
+.\darknet.exe detector train data\obj.data cfg\yolov4-cstm_subdiv.cfg C:\Users\chari\Desktop\YOLOv4_Training\darknet-master\backup\yolov4-cstm_last.weights -dont_show -map	
+
+
+
+#### Detector Testing
+./darknet.exe detector test data/obj.data cfg/yolov4-cstm_testing.cfg C:\Users\chari\Desktop\YOLOv4_Training\darknet-master\backup\yolov4-cstm_last.weights C:\Users\chari\Desktop\YOLOv4_Training\darknet-master\000_test_detect\1.jpg -thresh 0.5
+
+
+
+##TeslaV100 weights
+./darknet.exe detector test data/obj.data cfg/yolov4-cstm_testing_teslav100.cfg C:\Users\chari\Desktop\YOLOv4_Training\darknet-master\weights_teslav100\yolov4-cstm_best.weights C:\Users\chari\Desktop\YOLOv4_Training\darknet-master\000_test_detect\teslav100\1.jpg -thresh 0.5
+
+
+
+
+
+### 12000 old wrong data
+./darknet.exe detector test data/obj.data cfg/yolov4-cstm_testing_teslav100.cfg C:\Users\chari\Desktop\YOLOv4_Training\darknet-master\weights_teslav100\yolov4-cstm_12000.weights C:\Users\chari\Desktop\YOLOv4_Training\darknet-master\000_test_detect\teslav100\1.jpg -thresh 0.5
+
+
+#### 5000 correct labelled
+./darknet.exe detector test data/obj.data cfg/yolov4-cstm_testing_teslav100.cfg C:\Users\chari\Desktop\YOLOv4_Training\darknet-master\weights_teslav100\yolov4-cstm_5000_incl_alphas.weights C:\Users\chari\Desktop\YOLOv4_Training\darknet-master\000_test_detect\teslav100\1.jpg -thresh 0.5
+
+
+
+
+
+#### NO ALPHAS
+./darknet.exe detector test data/obj.data  cfg/yolov4-cstm_testing_no_alphas.cfg   weights_solo_VDA_4994/yolov4-cstm_best_416_64_subdiv_16.weights   000_test_detect/SOLO_VDA_4994/1.jpg -thresh 0.5
+
+
