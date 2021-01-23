@@ -16,6 +16,8 @@ from glob import glob
 import glob
 import os
 # fonts
+import PIL
+from io import BytesIO
 from PIL import ImageFont, ImageDraw, Image
 # random text/numbers
 from random import randrange, uniform, randint
@@ -58,9 +60,17 @@ yolo_version = 4
 path_to_training_images = Path(r"C:\Users\chari\Google Drive\00_Masterthesis\Masterarbeit\000_CODE\Git\01_YOLOv4_VDA_4994_DATASET_GENERATOR\00_Dataset_Generator_incl_YOLO_labeling\01_4k_images_raw\00_Raw_images_4K")  ## ipath to raw images from repo#
 #path_to_training_images = Path(r"C:\Users\chari\Google Drive\00_Masterthesis\Masterarbeit\000_CODE\Git\01_YOLOv4_VDA_4994_DATASET_GENERATOR\00_Dataset_Generator_incl_YOLO_labeling\01_4k_images_raw\xxx_Test_for_Image_generator")  ## ipath to raw images from repo
 
-""" include ALPHANUMERICS in DATAset"""
+"""FONT
+VDA 4994 = ARIAL_NARROW_BOLD """
+ARIAL_NARROW_BOLD_fontfilename = "ARIALNB.ttf"
+font_type_ttf_file = r"C:\Windows\Fonts\{}".format(ARIAL_NARROW_BOLD_fontfilename)
+font_type_ttf_path_full = r"C:\Windows\Fonts\ARIALNB.ttf"
+
+
+""" include ALPHANUMERICS (also just a few alphanumerics) in DATAset"""
 #### include alphanumerics in dataset 0 == false
-dataset_with_alphanumeric = 0
+dataset_with_alphanumeric = 1           ## bool 0 = no alphanumerics
+dataset_with_few_alphanumerics = 1      ## bool 1 = less alphanunerics string used (here only A-Z and 0-9) and no a-z
 
 """Image Size Definition"""
 image_resolution = "FullHD"  # "FullHD"  or 4K      ____4096 × 2160 (full frame, 256∶135 or ≈1.90∶1 aspect ratio)
@@ -76,34 +86,30 @@ white_depend_on_yellow_label = False  # if white and yellow label are always in 
 
 """SAVE FILES CORRECTLY (to hand over to YOLO for custom training)"""
 # 1st: Set current directory to folder underneath path of scripts to save all dataset images and textfiles"""
-dataset_path_alphanumerics = os.getcwd() + '\complete_dataset'  ## datafolder full created dataset for YOLOv3 / YOLOv4
+dataset_path_alphanumerics = os.getcwd() + '\complete_dataset_VDA_4994_incl_alphas'  ## datafolder full created dataset for YOLOv3 / YOLOv4
 dataset_path_VDA_4994       = os.getcwd() + '\complete_dataset'  ## datafolder full created dataset for YOLOv3 / YOLOv4
+
+dataset_path_VDA_4994_incl_alphas = os.getcwd() + '\complete_dataset_VDA_4994_incl_alphas'
 dataset_path_VDA_4994_no_alphanumerics = os.getcwd() + '\complete_dataset_VDA4994_solo' # dataset folder complete dataset just VDA labels (2 classes)
 
-
-
-
-
-def dataset_split_VDA_alphnumerics(dataset_path_VDA_4994, dataset_path_alphanumerics):
-    ## Function to split dataset
-    if dataset_path_VDA_4994 == dataset_path_alphanumerics:
-        dataset_path = dataset_path_VDA_4994
-    else:
-        dataset_path = dataset_path_VDA_4994
-
-    return dataset_path
+# def dataset_split_VDA_alphnumerics(dataset_path_VDA_4994, dataset_path_alphanumerics):
+#     ## Function to split dataset
+#     if dataset_path_VDA_4994 == dataset_path_alphanumerics:
+#         dataset_path = dataset_path_VDA_4994
+#     else:
+#         dataset_path = dataset_path_VDA_4994
+#
+#     return dataset_path
 
 """ Backup Folder for trained weights file (deciding wether training in Google Colab or Other Machine"""
 GOOGLE_COLAB_TRAINING = 0
-
 if GOOGLE_COLAB_TRAINING == 1:
     backup_folder = pathlib.Path(r"/mydrive/yolov{}/backup".format(yolo_version))   # backup folder for weights file
 else:
     backup_folder = pathlib.Path(r"{}/backup".format(os.getcwd()))
 
-
 """ Number of datset splits of the full dataset"""
-number_datasets = 7
+number_datasets = 3
 complete_dataset = [[]]
 complete_datset_np = np.array([], [])
 
@@ -113,6 +119,7 @@ labels_random_size_ratio_min = 0.2  # min 0.1
 labels_random_size_ratio_max = 10  # max 10
 alphanumeric_random_size_ratio_min = 0.1
 alphanumeric_random_size_ratio_max = 2.7
+min_numbr_random_alphas = 1
 max_nmbr_random_alphas = 37
 
 ### FullHD
@@ -125,16 +132,31 @@ alphanumeric_random_size_ratio_max_FullHD = alphanumeric_random_size_ratio_max /
 string_alphanumeric_numbers = "0123456789"
 string_alphanumeric_lowercase = "abcdefghijklmnopqrstuvwxyz"
 string_alphanumeric_uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-alphanumeric_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-                     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
-                     "U", "V", "W", "X", "Y", "Z",
-                     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
-                     "u", "v", "w", "x", "y", "z", "-"]
+
+if dataset_with_few_alphanumerics == 0:
+    alphanumeric_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+                         "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+                         "U", "V", "W", "X", "Y", "Z",
+                         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+                         "u", "v", "w", "x", "y", "z", "-"]
+
+    string_alphanumeric = string_alphanumeric_numbers + string_alphanumeric_uppercase + string_alphanumeric_lowercase
+
+else:
+    alphanumeric_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+                         "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+                         "U", "V", "W", "X", "Y", "Z"]
+
+    string_alphanumeric = "0123456789ABCDEFGHIJKLMOPQRSTUVWXYZ"
+
+    alphanumeric_list_11 = ["7", "A", "B", "C", "D", "E", "F", "G", "H"]
+    string_alphanumeric_11 = "7ABCDEFGH"
+
+
 print(len(alphanumeric_list))
+print(string_alphanumeric)
 
 
-
-string_alphanumeric = string_alphanumeric_numbers + string_alphanumeric_uppercase + string_alphanumeric_lowercase
 number_classes_alphanumeric = len(string_alphanumeric)
 print(number_classes_alphanumeric)
 print(len(string_alphanumeric))
@@ -180,15 +202,6 @@ class_names = []
 class_names.append(class_name_yellow_VDA)
 class_names.append(class_name_white_VDA_4994)
 
-
-
-
-if dataset_with_alphanumeric == 1:
-    dataset_path = dataset_path_VDA_4994
-else:
-    dataset_path = dataset_path_VDA_4994_no_alphanumerics
-
-
 if dataset_with_alphanumeric == 1:
     for alphas in range(len(alphanumeric_list)):
         class_names.append(alphanumeric_list[alphas])
@@ -196,6 +209,14 @@ else:
     pass
 
 number_of_classes = len(class_names)
+
+
+
+#### path to dataset
+if dataset_with_alphanumeric == 1:
+    dataset_path = dataset_path_VDA_4994_incl_alphas
+else:
+    dataset_path = dataset_path_VDA_4994_no_alphanumerics
 
 
 
@@ -611,7 +632,7 @@ for i in range(len(img_list_path_absolute)):
 
 
                 """ print random alphanumeric sign into loaded picture"""
-                number_printed_alphanumerical = int(random.uniform(1, max_nmbr_random_alphas))
+                number_printed_alphanumerical = int(random.uniform(min_numbr_random_alphas, max_nmbr_random_alphas))
                 string_filename_alphanum_complete = {}
                 nmbr_alphanum = 0
 
@@ -651,7 +672,7 @@ for i in range(len(img_list_path_absolute)):
                     factor_size_alphanumerics = random.uniform(alphanumeric_random_size_ratio_min,
                                                                alphanumeric_random_size_ratio_max)
 
-                    font_pil = ImageFont.truetype("arial.ttf", int(font_size_alphanumerics * factor_size_alphanumerics))
+                    font_pil = ImageFont.truetype(font_type_ttf_file, int(font_size_alphanumerics * factor_size_alphanumerics))
                     # Draw the text (including bboxes)
 
                     ### starting left top alphanumeric coordinates
@@ -708,7 +729,7 @@ for i in range(len(img_list_path_absolute)):
                     draw = ImageDraw.Draw(pil_im)
                     size_font_yolo_label_alphanum = 50
                     # use a truetype font and size
-                    font_pil = ImageFont.truetype("arial.ttf",
+                    font_pil = ImageFont.truetype(font_type_ttf_file,
                                                   int(size_font_yolo_label_alphanum * factor_size_alphanumerics))
                     # Draw the text
                     # draw.text((auto_calc_start_alphanumeric_left_top_x,
@@ -737,7 +758,8 @@ for i in range(len(img_list_path_absolute)):
                 """9. SAVE FILES CORRECTLY (to hand over to YOLO for custom training)"""
 
                 # 1st: Set current directory to folder underneath path of scripts to save all dataset images and textfiles"""
-                dataset_path_alphanumerics = os.getcwd() + '\complete_dataset'  ## datafolder full created dataset for YOLOv3 / YOLOv4
+                ##dataset_path_alphanumerics = os.getcwd() + '\complete_dataset'  ## datafolder full created dataset for YOLOv3 / YOLOv4
+
 
                 if not os.path.exists(dataset_path_alphanumerics):
                     os.makedirs(dataset_path_alphanumerics)
@@ -796,6 +818,7 @@ for i in range(len(img_list_path_absolute)):
                         normalized_YOLO_alphanum_width_list.append(normalized_width_YOLO_alphanum)
                         normalized_YOLO_alphanum_heigth_list.append(normalized_heigth_YOLO_alphanum)
 
+
                         value_index_search = value_random_alphanumerical_list[class_count_alphanum]
                         index_class_value_alphanum = class_names.index(value_index_search)
                         index_add = number_of_classes - len(alphanumeric_list)
@@ -811,6 +834,8 @@ for i in range(len(img_list_path_absolute)):
 
                         string_xywh_alphanum_bounding_box_of_function = drawn_alpha_coordinate_values[class_count_alphanum][-1]   # last list entry of drawn alpha
                         YOLO_label_string_alphanum = str(index_class_value_alphanum) + r" " + str(string_xywh_alphanum_bounding_box_of_function)
+
+
 
                         f.write(YOLO_label_string_alphanum)
                         f.write("\n")
@@ -914,7 +939,7 @@ for i in range(len(img_list_path_absolute)):
                 draw = ImageDraw.Draw(pil_im)
                 font_size_blyl = 20
                 # use a truetype font
-                font_pil = ImageFont.truetype("arial.ttf", int(font_size_blyl * factor_size_labels))
+                font_pil = ImageFont.truetype(font_type_ttf_file, int(font_size_blyl * factor_size_labels))
 
                 # Draw the text
                 #draw_pillow_text_with_bounding_box_coordinates(txt_pos_blyl_x, (txt_pos_blyl_y - factor_size_labels * font_size_blyl), label_yellow_text_combined, font_pil, "black", 0)
@@ -940,7 +965,7 @@ for i in range(len(img_list_path_absolute)):
                 draw = ImageDraw.Draw(pil_im)
                 size_font_ylbl = 35
                 # use a truetype font
-                font_pil = ImageFont.truetype("arial.ttf", int(size_font_ylbl * factor_size_labels))
+                font_pil = ImageFont.truetype(font_type_ttf_file, int(size_font_ylbl * factor_size_labels))
                 # Draw the text
                 # draw.text((txt_pos_ylbl_x, txt_pos_ylbl_y - factor_size_labels * size_font_ylbl),
                 #           random_text_gen(2, randomascii=False, uppercase=False, lowercase=False), fill="yellow",
@@ -1000,7 +1025,8 @@ for i in range(len(img_list_path_absolute)):
                 draw = ImageDraw.Draw(pil_im)
                 size_font_yolo_label_yellow = 15
                 # use a truetype font
-                font_pil = ImageFont.truetype("arial.ttf", int(size_font_yolo_label_yellow * factor_size_labels))
+                font_pil = ImageFont.truetype(font_type_ttf_file, int(size_font_yolo_label_yellow * factor_size_labels))
+
                 # Draw the text
                 # draw.text((txt_pos_yl_yolov3_label_x,
                 #            txt_pos_yl_yolov3_label_y - factor_size_labels * size_font_yolo_label_yellow),
@@ -1115,9 +1141,20 @@ for i in range(len(img_list_path_absolute)):
                 label_white_str = article_code_VDA_4494_white [1]
                 article_code_VDA_4494_white_list = article_code_VDA_4494_white[0]
 
+                ### check if value is in class_names list for labelling
+                article_code_VDA_4494_white_list_textfile = []
+
+                for count_article_code in range(1,len(article_code_VDA_4494_white_list)):
+
+                    if article_code_VDA_4494_white_list[count_article_code] in class_names:
+                        article_code_VDA_4494_white_list_textfile.append(article_code_VDA_4494_white_list[count_article_code])
+                    else:
+                        pass
+
                 single_values_article_code = []
                 for count_single_alphas_article in range(len(article_code_VDA_4494_white_list)):
                     single_values_article_code.append(article_code_VDA_4494_white_list[count_single_alphas_article])
+
 
 
                 # label_1st_pos = random_text_gen(3, randomascii=False, uppercase=True)
@@ -1159,14 +1196,28 @@ for i in range(len(img_list_path_absolute)):
 
                 font_size_white_label = 15
                 # use a truetype font
-                #path_font_file_arial_narrow_bold_VDA_4994 = pathlib.Path(r"")
-                #PIL.ImageFont.load(path_font_file_arial_narrow_bold_VDA_4994)
+                ###workaround
+                # path_font_file_arial_narrow_bold_VDA_4994 = pathlib.Path(font_type_ttf_path_full)
+                # font_test = PIL.ImageFont.load(str(path_font_file_arial_narrow_bold_VDA_4994))
 
-                font_pil = ImageFont.truetype("arial.ttf", int(font_size_white_label * factor_size_labels))
+                # font_test = ImageFont.truetype(font_test, int(font_size_white_label * factor_size_labels))
 
-                yolo_bboxes_article_code_VDA_4994 = draw_pillow_text_with_bounding_box_coordinates(txt_pos_wh_x, txt_pos_wh_y,img.shape[1],img.shape[0],
-                                                                                                   label_white_str, font_pil,
-                                                                                                   "black",0)  # ((int,int), str, font object, str)
+
+                font_type_VDA4994 = ImageFont.truetype(font_type_ttf_file, int(font_size_white_label * factor_size_labels))
+                yolo_bboxes_article_code_VDA_4994 = draw_pillow_text_with_bounding_box_coordinates(txt_pos_wh_x,
+                                                                                                   txt_pos_wh_y,
+                                                                                                   img.shape[1],
+                                                                                                   img.shape[0],
+                                                                                                   label_white_str,
+                                                                                                   font_type_VDA4994,
+                                                                                                   "black", 0)
+
+
+                # font_pil = ImageFont.truetype("arial.ttf", int(font_size_white_label * factor_size_labels))
+                #
+                # yolo_bboxes_article_code_VDA_4994 = draw_pillow_text_with_bounding_box_coordinates(txt_pos_wh_x, txt_pos_wh_y,img.shape[1],img.shape[0],
+                #                                                                                    label_white_str, font_pil,
+                #                                                                                    "black",0)  # ((int,int), str, font object, str)
 
 
                 # Draw the text
@@ -1224,7 +1275,7 @@ for i in range(len(img_list_path_absolute)):
                 draw = ImageDraw.Draw(pil_im)
                 size_font_yolo_label_white = 15
                 # use a truetype font and size
-                font_pil = ImageFont.truetype("arial.ttf", int(size_font_yolo_label_white * factor_size_labels))
+                font_pil = ImageFont.truetype(font_type_ttf_file, int(size_font_yolo_label_white * factor_size_labels))
                 # Draw the text
                 # draw.text((txt_pos_wht_yolov3_label_x,
                 #            txt_pos_wht_yolov3_label_y - factor_size_labels * size_font_yolo_label_white),
@@ -1237,9 +1288,21 @@ for i in range(len(img_list_path_absolute)):
                 """ SAVING IMAGE AND TEXT CORRECTLY for YOLOv3/v4 (11/2020) and SPLIT DATSET for CROSS-Validation"""
                 """9. SAVE FILES CORRECTLY (to hand over to YOLO for custom training)"""
                 # 1st: Set current directory to folder underneath path of scripts to save all dataset images and textfiles"""
-                dataset_path_VDA_4994 = os.getcwd() + '\complete_dataset'  ## datafolder full created dataset for YOLOv3 / YOLOv4
-                if not os.path.exists(dataset_path_VDA_4994):
-                    os.makedirs(dataset_path_VDA_4994)
+                dataset_path_VDA_4994_incl_alphas = os.getcwd() + '\complete_dataset_VDA_4994_incl_alphas'  ## datafolder full created dataset for YOLOv3 / YOLOv4
+
+                #  remove old yolov4 dataset directory if exist in first step
+                if  os.path.exists(dataset_path_VDA_4994_incl_alphas) and count==0:
+                    directory_clean = Path(dataset_path_VDA_4994_incl_alphas)
+                    shutil.rmtree(directory_clean, ignore_errors=True)
+
+                else:
+                    if not os.path.exists(dataset_path_VDA_4994_incl_alphas):
+                        os.makedirs(dataset_path_VDA_4994_incl_alphas)
+                    else:
+                        pass
+
+
+
 
                 #### Todo write  more variables in string in filename for picture name and opencv operation
                 # """ show and write image """
@@ -1248,7 +1311,7 @@ for i in range(len(img_list_path_absolute)):
                 filename_str = '%s --- %s.jpg' % (label_yellow_text_combined, label_white_str)
                 filename_txt = '%s --- %s.txt' % (label_yellow_text_combined, label_white_str)
                 print(filename_str)
-                cv2.imwrite(dataset_path_VDA_4994 + '\ ' + filename_str, img)  # creates image of img with filename via OPENCV
+                cv2.imwrite(dataset_path_VDA_4994_incl_alphas + '\ ' + filename_str, img)  # creates image of img with filename via OPENCV
                 # cv2.imshow(filename_str, img)
                 # cv2.waitKey(0)
                 # cv2.destroyAllWindows()
@@ -1320,27 +1383,71 @@ for i in range(len(img_list_path_absolute)):
                 """ write textfile for VDA including alphanumeric YOLO labelling calculated by own functionality"""
                 # os.chdir(dataset_path)
 
-                with open(dataset_path_VDA_4994 + '\ ' + filename_txt, 'w') as f:
+                with open(dataset_path_VDA_4994_incl_alphas + '\ ' + filename_txt, 'w') as f:
+
                     f.write(YOLO_label_string_yellow)
                     f.write("\n")
                     f.write(YOLO_label_string_white)
                     f.write("\n")
+                    ### check if value is in class_names list for labelling
 
-                    ### add alphanumerics of article code string
-                    for class_count_alphanum_whiteVDA in range(len(single_values_article_code)):
-                        value_index_search = single_values_article_code[class_count_alphanum_whiteVDA]
-                        index_class_value_alphanum = class_names.index(value_index_search)
-                        index_add = number_of_classes - len(alphanumeric_list)
-
-                        #string_value_class = class_names.index(value_index_search) + (number_of_classes - (len(alphanumeric_list) - 1))
-
-                        string_normalized_xywh_alphanum_bounding_box_of_function = yolo_bboxes_article_code_VDA_4994[-2][class_count_alphanum_whiteVDA] # last list entry of drawn alpha
-
-                        YOLO_label_VDA_article_code = str(index_class_value_alphanum) + r" " + str(string_normalized_xywh_alphanum_bounding_box_of_function)
+                    article_code_VDA_4494_white_list_textfile = []
 
 
-                        f.write(YOLO_label_VDA_article_code)
-                        f.write("\n")
+                    for count_article_code in range(len(article_code_VDA_4494_white_list)):
+
+                        if article_code_VDA_4494_white_list[count_article_code] in class_names:
+
+
+                            article_code_VDA_4494_white_list_textfile.append(article_code_VDA_4494_white_list[count_article_code])
+                            index_value_class_names =  class_names.index(article_code_VDA_4494_white_list[count_article_code])
+                            string_normalized_xywh_alphanum_bounding_box_of_function = yolo_bboxes_article_code_VDA_4994[-2][count_article_code]  # last list entry of drawn alpha
+                            YOLO_label_VDA_article_code = str(index_value_class_names) + r" " + str(string_normalized_xywh_alphanum_bounding_box_of_function)
+
+                            #return value of  YOLO_label_VDA_article_code
+                            f.write(YOLO_label_VDA_article_code)
+                            f.write("\n")
+
+                        else:
+                            pass
+
+
+
+
+                    # ## add alphanumerics of article code string
+                    # for class_count_alphanum_whiteVDA in range(1,len(single_values_article_code)):
+                    #
+                    #     value_index_search = single_values_article_code[class_count_alphanum_whiteVDA]
+                    #     #value_index_search = single_values_article_code[0]
+                    #
+                    #     #index_class_value_alphanum = []
+                    #
+                    #     if value_index_search in class_names is True:
+                    #
+                    #         index_class_value_alphanum = value_index_search
+                    #         index_add = number_of_classes - len(alphanumeric_list)
+                    #
+                    #         #string_value_class = class_names.index(value_index_search) + (number_of_classes - (len(alphanumeric_list) - 1))
+                    #
+                    #         string_normalized_xywh_alphanum_bounding_box_of_function = yolo_bboxes_article_code_VDA_4994[-2][class_count_alphanum_whiteVDA] # last list entry of drawn alpha
+                    #
+                    #         YOLO_label_VDA_article_code = str(index_class_value_alphanum) + r" " + str(string_normalized_xywh_alphanum_bounding_box_of_function)
+                    #
+                    #
+                    #         f.write(YOLO_label_VDA_article_code)
+                    #         f.write("\n")
+                    #
+                    #     else:
+                    #         #YOLO_label_VDA_article_code = ""
+                    #         pass
+                    #         # f.write(YOLO_label_VDA_article_code)
+                    #         # f.write("\n")
+
+
+
+
+
+
 
 
 
@@ -1454,7 +1561,7 @@ for i in range(len(img_list_path_absolute)):
             draw = ImageDraw.Draw(pil_im)
             font_size_blyl = 20
             # use a truetype font
-            font_pil = ImageFont.truetype("arial.ttf", int(font_size_blyl * factor_size_labels))
+            font_pil = ImageFont.truetype(font_type_ttf_file, int(font_size_blyl * factor_size_labels))
 
             # Draw the text
             draw_pillow_text_with_bounding_box_coordinates(txt_pos_blyl_x, (txt_pos_blyl_y - factor_size_labels * font_size_blyl), img.shape[1], img.shape[0], label_yellow_text_combined, font_pil, "black", 0)
@@ -1478,7 +1585,7 @@ for i in range(len(img_list_path_absolute)):
             draw = ImageDraw.Draw(pil_im)
             size_font_ylbl = 35
             # use a truetype font
-            font_pil = ImageFont.truetype("arial.ttf", int(size_font_ylbl * factor_size_labels))
+            font_pil = ImageFont.truetype(font_type_ttf_file, int(size_font_ylbl * factor_size_labels))
             # Draw the text
             draw.text((txt_pos_ylbl_x, txt_pos_ylbl_y - factor_size_labels * size_font_ylbl),
                       random_text_gen(2, randomascii=False, uppercase=False, lowercase=False), fill="yellow",
@@ -1536,7 +1643,7 @@ for i in range(len(img_list_path_absolute)):
             draw = ImageDraw.Draw(pil_im)
             size_font_yolo_label_yellow = 15
             # use a truetype font
-            font_pil = ImageFont.truetype("arial.ttf", int(size_font_yolo_label_yellow * factor_size_labels))
+            font_pil = ImageFont.truetype(font_type_ttf_file, int(size_font_yolo_label_yellow * factor_size_labels))
             # Draw the text
             # draw.text((txt_pos_yl_yolov3_label_x,
             #            txt_pos_yl_yolov3_label_y - factor_size_labels * size_font_yolo_label_yellow),
@@ -1700,7 +1807,7 @@ for i in range(len(img_list_path_absolute)):
             # path_font_file_arial_narrow_bold_VDA_4994 = pathlib.Path(r"")
             # PIL.ImageFont.load(path_font_file_arial_narrow_bold_VDA_4994)
 
-            font_pil = ImageFont.truetype("arial.ttf", int(font_size_white_label * factor_size_labels))
+            font_pil = ImageFont.truetype(font_type_ttf_file, int(font_size_white_label * factor_size_labels))
 
             yolo_bboxes_article_code_VDA_4994 = draw_pillow_text_with_bounding_box_coordinates(txt_pos_wh_x,
                                                                                                txt_pos_wh_y,
@@ -1766,7 +1873,7 @@ for i in range(len(img_list_path_absolute)):
             draw = ImageDraw.Draw(pil_im)
             size_font_yolo_label_white = 15
             # use a truetype font and size
-            font_pil = ImageFont.truetype("arial.ttf", int(size_font_yolo_label_white * factor_size_labels))
+            font_pil = ImageFont.truetype(font_type_ttf_file, int(size_font_yolo_label_white * factor_size_labels))
             # Draw the text
             # draw.text((txt_pos_wht_yolov3_label_x,
             #            txt_pos_wht_yolov3_label_y - factor_size_labels * size_font_yolo_label_white),
@@ -1781,8 +1888,18 @@ for i in range(len(img_list_path_absolute)):
             """9. SAVE FILES CORRECTLY (to hand over to YOLO for custom training)"""
             # 1st: Set current directory to folder underneath path of scripts to save all dataset images and textfiles"""
             dataset_path_VDA_4994 = dataset_path #os.getcwd() + '\complete_dataset'  ## datafolder full created dataset for YOLOv3 / YOLOv4
-            if not os.path.exists(dataset_path_VDA_4994):
-                os.makedirs(dataset_path_VDA_4994)
+
+            #  remove old yolov4 dataset directory if exist in first step
+            if os.path.exists(dataset_path_VDA_4994) and count == 0:
+                directory_clean = Path(dataset_path_VDA_4994)
+                shutil.rmtree(directory_clean, ignore_errors=True)
+            else:
+                if not os.path.exists(dataset_path_VDA_4994):
+                    os.makedirs(dataset_path_VDA_4994)
+                else:
+                    pass
+
+
 
             #### Todo write  more variables in string in filename for picture name and opencv operation
             # """ show and write image """
@@ -1871,6 +1988,7 @@ for i in range(len(img_list_path_absolute)):
                 # for class_count_alphanum_whiteVDA in range(len(single_values_article_code)):
                 #     value_index_search = single_values_article_code[class_count_alphanum_whiteVDA]
                 #     index_class_value_alphanum = class_names.index(value_index_search)
+
                 #     index_add = number_of_classes - len(alphanumeric_list)
                 #
                 #     # string_value_class = class_names.index(value_index_search) + (number_of_classes - (len(alphanumeric_list) - 1))
@@ -1890,6 +2008,9 @@ for i in range(len(img_list_path_absolute)):
 
         complete_dataset.append([filename_str, filename_txt])
         complete_dataset_np = np.append(filename_str, filename_txt)
+
+
+
 
 
 
@@ -1924,6 +2045,10 @@ with open(dataset_path + '\obj.data', 'w') as f:
     f.write("backup = {}".format(str(backup_folder)))
 
 ###############################################################################
+
+
+
+
 
 
 
@@ -2035,12 +2160,13 @@ for key, value in training_dataset.items():
     dataset_path_training_new = os.getcwd() + r'\yolov{}\Dataset_{}\obj'.format(yolo_version,
                                                                                 key)  ## datafolder full created dataset for YOLOv3 / YOLOv4
     backup_folder_dir_for_trained_weights = os.getcwd() + r'\yolov{}\Dataset_{}\backup'.format(yolo_version, key)
+
+
     if not os.path.exists(dataset_path_training_new):
         os.makedirs(dataset_path_training_new)
         os.makedirs(backup_folder_dir_for_trained_weights)
     # 2nd remove old yolov4 dataset direcory if exist
     else:
-
         directory_clean = Path(os.getcwd() + r'\yolov{}\Dataset_{}\obj'.format(yolo_version, key))
         shutil.rmtree(directory_clean, ignore_errors=True)
         # creat new directory

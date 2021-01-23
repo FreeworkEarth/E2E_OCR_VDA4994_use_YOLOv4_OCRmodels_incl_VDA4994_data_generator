@@ -1,2 +1,0 @@
-yellow_VDA_label
-white_VDA_label
